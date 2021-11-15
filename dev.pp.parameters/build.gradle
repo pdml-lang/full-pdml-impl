@@ -1,0 +1,29 @@
+plugins {
+    id 'java'
+}
+
+version = '0.8.0'
+
+repositories {
+    mavenCentral()
+}
+
+dependencies {
+    testImplementation 'org.junit.jupiter:junit-jupiter-api:5.4.2'
+    testRuntimeOnly 'org.junit.jupiter:junit-jupiter-engine:5.4.2'
+
+    implementation project ( ':dev.pp.text' )
+    implementation project ( ':dev.pp.datatype' )
+}
+
+java {
+    toolchain {
+        languageVersion = JavaLanguageVersion.of(11)
+    }
+}
+
+test {
+    useJUnitPlatform()
+    // true by default
+    enableAssertions = true
+}
