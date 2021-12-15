@@ -1,6 +1,6 @@
 package dev.pdml.core.data.AST.name;
 
-import dev.pdml.core.Constants;
+import dev.pdml.core.PDMLConstants;
 // import dev.pdml.core.data.AST.ASTElement;
 import dev.pdml.core.data.AST.namespace.ASTNamespace;
 import dev.pp.text.location.TextLocation;
@@ -63,7 +63,7 @@ public class ASTNodeName { // implements ASTElement {
 
         if ( namespace != null ) {
             sb.append ( getNamespacePrefixText() );
-            sb.append ( Constants.NAMESPACE_PREFIX_NAME_SEPARATOR );
+            sb.append ( PDMLConstants.NAMESPACE_PREFIX_NAME_SEPARATOR );
         }
 
         sb.append ( getLocalNameText() );

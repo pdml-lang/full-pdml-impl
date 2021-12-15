@@ -1,6 +1,6 @@
 package dev.pdml.ext.extensions;
 
-import dev.pdml.core.Constants;
+import dev.pdml.core.PDMLConstants;
 import dev.pdml.core.data.AST.name.ASTNodeName;
 import dev.pp.text.reader.exception.TextReaderException;
 import dev.pdml.core.reader.parser.ParserHelper;
@@ -54,13 +54,13 @@ public class DefaultPXMLExtensionsHandler implements PXMLExtensionsHandler {
 
         PXMLReader reader = context.getPXMLReader();
 
-        if ( ! reader.isAtChar ( Constants.NODE_START ) ) return false;
+        if ( ! reader.isAtChar ( PDMLConstants.NODE_START ) ) return false;
 
         if ( reader.isNextChar ( StandardExtensionsConstants.START_SYMBOL ) ) {
             handleStandardExtension ( context );
             return true;
         } else {
-            if ( ! reader.isNextChar ( Constants.COMMENT_SYMBOL ) ) {
+            if ( ! reader.isNextChar ( PDMLConstants.COMMENT_SYMBOL ) ) {
                 return handleCustomizedExtension ( context );
             } else {
                 return false;

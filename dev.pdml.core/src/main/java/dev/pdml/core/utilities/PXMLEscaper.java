@@ -1,7 +1,7 @@
 package dev.pdml.core.utilities;
 
 import dev.pp.text.annotations.NotNull;
-import dev.pdml.core.Constants;
+import dev.pdml.core.PDMLConstants;
 
 import java.io.IOException;
 import java.io.Writer;
@@ -13,9 +13,9 @@ public class PXMLEscaper {
     public static boolean mustEscapeInNodeText ( char c ) {
 
         switch ( c ) {
-            case Constants.NODE_START:
-            case Constants.NODE_END:
-            case Constants.ESCAPE_CHARACTER:
+            case PDMLConstants.NODE_START:
+            case PDMLConstants.NODE_END:
+            case PDMLConstants.ESCAPE_CHARACTER:
                 return true;
             default:
                 return false;
@@ -38,7 +38,7 @@ public class PXMLEscaper {
 
     public static void appendNodeTextChar ( char c, @NotNull StringBuilder sb ) {
 
-        if ( mustEscapeInNodeText ( c ) ) sb.append ( Constants.ESCAPE_CHARACTER );
+        if ( mustEscapeInNodeText ( c ) ) sb.append ( PDMLConstants.ESCAPE_CHARACTER );
         sb.append ( c );
     }
 
@@ -51,7 +51,7 @@ public class PXMLEscaper {
 
     public static void writeNodeTextChar ( char c, @NotNull Writer writer ) throws IOException {
 
-        if ( mustEscapeInNodeText ( c ) ) writer.write ( Constants.ESCAPE_CHARACTER );
+        if ( mustEscapeInNodeText ( c ) ) writer.write ( PDMLConstants.ESCAPE_CHARACTER );
         writer.write ( c );
     }
 
@@ -61,8 +61,8 @@ public class PXMLEscaper {
     public static boolean mustEscapeInDoubleQuotedAttributeValue ( char c ) {
 
         switch ( c ) {
-            case Constants.ATTRIBUTE_VALUE_DOUBLE_QUOTE:
-            case Constants.ESCAPE_CHARACTER:
+            case PDMLConstants.ATTRIBUTE_VALUE_DOUBLE_QUOTE:
+            case PDMLConstants.ESCAPE_CHARACTER:
                 return true;
             default:
                 return false;
@@ -85,7 +85,7 @@ public class PXMLEscaper {
 
     public static void appendDoubleQuotedAttributeValueChar ( char c, @NotNull StringBuilder sb ) {
 
-        if ( mustEscapeInDoubleQuotedAttributeValue ( c ) ) sb.append ( Constants.ESCAPE_CHARACTER );
+        if ( mustEscapeInDoubleQuotedAttributeValue ( c ) ) sb.append ( PDMLConstants.ESCAPE_CHARACTER );
         sb.append ( c );
     }
 
@@ -99,7 +99,7 @@ public class PXMLEscaper {
 
     public static void writeDoubleQuotedAttributeValueChar ( char c, @NotNull Writer writer ) throws IOException {
 
-        if ( mustEscapeInDoubleQuotedAttributeValue ( c ) ) writer.write ( Constants.ESCAPE_CHARACTER );
+        if ( mustEscapeInDoubleQuotedAttributeValue ( c ) ) writer.write ( PDMLConstants.ESCAPE_CHARACTER );
         writer.write ( c );
     }
 }

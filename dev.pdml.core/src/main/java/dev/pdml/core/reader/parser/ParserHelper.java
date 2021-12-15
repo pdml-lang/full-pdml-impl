@@ -1,6 +1,6 @@
 package dev.pdml.core.reader.parser;
 
-import dev.pdml.core.Constants;
+import dev.pdml.core.PDMLConstants;
 import dev.pdml.core.data.AST.attribute.ASTNodeAttribute;
 import dev.pdml.core.data.AST.attribute.ASTNodeAttributes;
 import dev.pdml.core.data.AST.name.ASTNodeName;
@@ -113,7 +113,7 @@ public class ParserHelper {
         final TextToken namespacePrefixOrLocalName = parseSingleName ( reader );
         if ( namespacePrefixOrLocalName == null ) return null;
 
-        if ( ! reader.skipChar ( Constants.NAMESPACE_PREFIX_NAME_SEPARATOR ) ) {
+        if ( ! reader.skipChar ( PDMLConstants.NAMESPACE_PREFIX_NAME_SEPARATOR ) ) {
             return new ASTRawNodeName ( namespacePrefixOrLocalName, null );
         } else {
             TextToken localName = requireSingleName ( reader, errorHandler );
@@ -149,7 +149,7 @@ public class ParserHelper {
         if ( ! parseNodeStart ( reader ) ) {
             throw cancelingErrorAtCurrentLocation (
                 "EXPECTING_NODE_START",
-                "Expecting '" + Constants.NODE_START + "' to start a new node.",
+                "Expecting '" + PDMLConstants.NODE_START + "' to start a new node.",
                 reader, errorHandler );
         }
     }
@@ -170,7 +170,7 @@ public class ParserHelper {
         if ( ! parseNodeEnd ( reader ) ) {
             throw cancelingErrorAtCurrentLocation (
                 "EXPECTING_NODE_END",
-                "Expecting '" + Constants.NODE_END + "' to close node '" + nodeName.fullName() + "'.", // TODO add location
+                "Expecting '" + PDMLConstants.NODE_END + "' to close node '" + nodeName.fullName() + "'.", // TODO add location
                 reader, errorHandler );
         }
     }
@@ -206,13 +206,13 @@ public class ParserHelper {
         if ( ! reader.hasChar() ) return null;
 
         TextLocation startLocation = reader.currentLocation();
-        if ( ! reader.skipString ( Constants.NAMESPACE_DECLARATION_START ) ) return null;
-        TextToken startToken = new TextToken ( String.valueOf ( Constants.NAMESPACE_DECLARATION_START ), startLocation );
+        if ( ! reader.skipString ( PDMLConstants.NAMESPACE_DECLARATION_START ) ) return null;
+        TextToken startToken = new TextToken ( String.valueOf ( PDMLConstants.NAMESPACE_DECLARATION_START ), startLocation );
 
         if ( ! reader.skipOneSpaceOrTabOrNewline () ) {
             nonCancelingErrorAtCurrentLocation (
                 "EXPECTING_NAMESPACE_SEPARATOR",
-                "'" + Constants.NAMESPACE_DECLARATION_START + "' must be followed by a space, tab, or new line",
+                "'" + PDMLConstants.NAMESPACE_DECLARATION_START + "' must be followed by a space, tab, or new line",
                 reader,
                 errorHandler );
         }
@@ -253,7 +253,7 @@ public class ParserHelper {
                     "'" + URIToken.getText() + "' is an invalid URI. Reason: " + e.getMessage(),
                     URIToken,
                     errorHandler );
-                URI = Constants.UNKNOWN_URI;
+                URI = PDMLConstants.UNKNOWN_URI;
             }
 
             ASTNamespace namespace = new ASTNamespace ( prefix, URIToken, URI );
@@ -317,7 +317,7 @@ public class ParserHelper {
         throws TextReaderException {
 
         // reader.skipWhitespaceAndComments();
-        if ( reader.isAtChar ( Constants.ATTRIBUTES_START ) ) {
+        if ( reader.isAtChar ( PDMLConstants.ATTRIBUTES_START ) ) {
             return parseAttributesWithParenthesis (
                 reader, defaultAttributeName, namespaceGetter, skipSpaceAfterClosingParenthesis, errorHandler );
         } else {
@@ -348,8 +348,8 @@ public class ParserHelper {
         throws TextReaderException {
 
         TextLocation startLocation = reader.currentLocation();
-        if ( ! reader.skipChar ( Constants.ATTRIBUTES_START ) ) return null;
-        TextToken startToken = new TextToken ( String.valueOf ( Constants.ATTRIBUTES_START ), startLocation );
+        if ( ! reader.skipChar ( PDMLConstants.ATTRIBUTES_START ) ) return null;
+        TextToken startToken = new TextToken ( String.valueOf ( PDMLConstants.ATTRIBUTES_START ), startLocation );
 
         return parseAttributesUntilEndParenthesis (
             reader, startToken, defaultAttributeName, namespaceGetter, skipSpaceAfterClosingParenthesis, errorHandler );
@@ -373,14 +373,14 @@ public class ParserHelper {
 
             reader.skipWhitespaceAndComments();
 
-            if ( reader.skipChar ( Constants.ATTRIBUTES_END ) ) {
+            if ( reader.skipChar ( PDMLConstants.ATTRIBUTES_END ) ) {
                 if ( skipSpaceAfterClosingParenthesis ) reader.skipChar ( ' ' );
                 break;
             }
 
             if ( ! reader.hasChar () ) throw cancelingErrorAtCurrentLocation (
                 "MISSING_ATTRIBUTES_END",
-                "Missing attributes end symbol '" + Constants.ATTRIBUTES_END + "'.",
+                "Missing attributes end symbol '" + PDMLConstants.ATTRIBUTES_END + "'.",
                 reader, errorHandler );
 
             ASTNodeAttribute attribute = requireOneAttribute ( reader, namespaceGetter, errorHandler );
@@ -412,7 +412,7 @@ public class ParserHelper {
                 if ( isAtAttributesEnd ( reader ) ) break;
             } else {
                 reader.skipWhitespaceAndComments();
-                if ( reader.isAtChar ( Constants.NODE_END ) ) break;
+                if ( reader.isAtChar ( PDMLConstants.NODE_END ) ) break;
             }
 
             ASTNodeAttribute attribute = requireOneAttribute ( reader, namespaceGetter, errorHandler );
@@ -426,8 +426,8 @@ public class ParserHelper {
     private static boolean isAtAttributesEnd ( @NotNull PXMLReader reader ) {
 
         switch ( reader.currentChar() ) {
-            case Constants.NODE_END:
-            case Constants.NODE_START:
+            case PDMLConstants.NODE_END:
+            case PDMLConstants.NODE_START:
             case CharConstants.UNIX_NEW_LINE:
             case CharConstants.WINDOWS_NEW_LINE_START:
                 return true;
@@ -467,8 +467,8 @@ public class ParserHelper {
 
         reader.skipWhitespaceAndComments();
 
-        if ( ! ( reader.isAtChar ( Constants.ATTRIBUTE_VALUE_DOUBLE_QUOTE ) ||
-            reader.isAtChar ( Constants.ATTRIBUTE_VALUE_SINGLE_QUOTE ) ) ) return;
+        if ( ! ( reader.isAtChar ( PDMLConstants.ATTRIBUTE_VALUE_DOUBLE_QUOTE ) ||
+            reader.isAtChar ( PDMLConstants.ATTRIBUTE_VALUE_SINGLE_QUOTE ) ) ) return;
 
         TextToken value = reader.readQuotedAttributeValueToken();
         assert value != null;
@@ -527,10 +527,10 @@ public class ParserHelper {
         @NotNull ASTNodeName attributeName,
         @NotNull TextErrorHandler errorHandler ) throws PXMLResourceException, MalformedPXMLDocumentException {
 
-        if ( ! reader.skipChar ( Constants.ATTRIBUTE_ASSIGN ) ) {
+        if ( ! reader.skipChar ( PDMLConstants.ATTRIBUTE_ASSIGN ) ) {
             throw cancelingErrorAtCurrentLocation (
                 "EXPECTING_ATTRIBUTE_ASSIGN_SYMBOL",
-                "Expecting character '" + Constants.ATTRIBUTE_ASSIGN + "' to assign a value to attribute '"
+                "Expecting character '" + PDMLConstants.ATTRIBUTE_ASSIGN + "' to assign a value to attribute '"
                     + attributeName + "', but found '" + reader.currentChar () + "'.",
                 reader, errorHandler );
         }

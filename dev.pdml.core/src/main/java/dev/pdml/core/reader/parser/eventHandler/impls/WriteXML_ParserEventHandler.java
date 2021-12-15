@@ -1,6 +1,6 @@
 package dev.pdml.core.reader.parser.eventHandler.impls;
 
-import dev.pdml.core.Constants;
+import dev.pdml.core.PDMLConstants;
 import dev.pdml.core.data.AST.attribute.ASTNodeAttribute;
 import dev.pdml.core.data.AST.attribute.ASTNodeAttributes;
 import dev.pdml.core.data.AST.name.ASTNodeName;
@@ -41,13 +41,13 @@ public class WriteXML_ParserEventHandler implements ParserEventHandler<ASTNodeNa
     public void onStart() throws XMLStreamException {
 
         XMLWriter.writeStartDocument ( StandardCharsets.UTF_8.name(), "1.0" );
-        XMLWriter.writeCharacters ( Constants.NEW_LINE );
+        XMLWriter.writeCharacters ( PDMLConstants.NEW_LINE );
     }
 
     public void onEnd () throws XMLStreamException {
 
         XMLWriter.writeEndDocument();
-        XMLWriter.writeCharacters ( Constants.NEW_LINE );
+        XMLWriter.writeCharacters ( PDMLConstants.NEW_LINE );
     }
 
     public @NotNull

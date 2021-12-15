@@ -5,11 +5,15 @@ import dev.pdml.core.data.AST.children.*;
 import dev.pdml.core.data.AST.name.ASTNodeName;
 import dev.pdml.core.data.AST.namespace.ASTNamespace;
 import dev.pdml.core.data.AST.namespace.ASTNamespaces;
+import dev.pdml.core.reader.exception.InvalidPDMLDocumentException;
+import dev.pp.text.error.handler.TextErrorHandler;
 import dev.pp.text.location.TextLocation;
 import dev.pp.text.annotations.NotNull;
 import dev.pp.text.annotations.Nullable;
 import dev.pp.text.token.TextToken;
 
+import java.lang.annotation.Native;
+import java.util.List;
 import java.util.function.Consumer;
 
 public class ASTNode { // implements ASTElement {
@@ -42,8 +46,7 @@ public class ASTNode { // implements ASTElement {
 
     // namespace
 
-    public @Nullable
-    ASTNamespace getNamespace() { return name.getNamespace(); }
+    public @Nullable ASTNamespace getNamespace() { return name.getNamespace(); }
 
     public boolean hasNamespace() { return getNamespace() != null; }
 
@@ -69,7 +72,7 @@ public class ASTNode { // implements ASTElement {
 
     public void setChildren ( @Nullable ASTNodeChildren children ) { this.children = children; }
 
-    public void appendChildNode ( ASTNode childNode ) {
+    public void appendNodeChild ( ASTNode childNode ) {
 
         ensureHasChildren();
 
@@ -90,6 +93,7 @@ public class ASTNode { // implements ASTElement {
         children.append ( new Comment_ASTNodeChild ( comment ) );
     }
 
+/*
     public void visitTree ( @NotNull Consumer<ASTNodeChild> consumer ) {
 
         visitChildren ( new Node_ASTNodeChild ( this ), true, consumer );
@@ -116,7 +120,79 @@ public class ASTNode { // implements ASTElement {
             visitChildren ( child, true, consumer );
         }
     }
+*/
 
+    public @Nullable List<ASTNode> getNodeChildrenByLocalNameOrNull ( String localName ) {
+
+        return children == null ? null : children.nodeElementsByLocalName ( localName );
+    }
+
+    public @Nullable ASTNode getUniqueNodeChildByLocalNameOrNull ( String localName ) {
+
+        @Nullable List<ASTNode> list = getNodeChildrenByLocalNameOrNull ( localName );
+        if ( list == null ) {
+            return null;
+        } else if ( list.size() == 1 ) {
+            return list.get ( 0 );
+        } else {
+            return null;
+        }
+    }
+
+    public @NotNull ASTNode getUniqueNodeChildByLocalName ( String localName ) throws InvalidPDMLDocumentException {
+
+        ASTNode result = getUniqueNodeChildByLocalNameOrNull ( localName );
+        if ( result != null ) {
+            return result;
+        } else {
+            throw new InvalidPDMLDocumentException (
+                "MISSING_UNIQUE_CHILD_NODE",
+                "Node '" + getName().fullName() + "' must have exactly one child node with name '" + localName + "'.",
+                getName().getToken() );
+        }
+    }
+
+    public @Nullable ASTNode getUniqueNodeChildByLocalName ( String localName, TextErrorHandler errorHandler ) {
+
+        try {
+            return getUniqueNodeChildByLocalName ( localName );
+        } catch ( InvalidPDMLDocumentException e ) {
+            errorHandler.handleError ( e.getId(), e.getMessage(), e.getToken() );
+            return null;
+        }
+    }
+
+    public @Nullable String getTextOfUniqueTextChildNodeByLocalNameOrNull ( String localName ) {
+
+        ASTNode childNode = getUniqueNodeChildByLocalNameOrNull ( localName );
+
+        return childNode == null ? null : childNode.getSingleTextContentOrNull();
+    }
+
+    public @NotNull String getTextOfUniqueTextChildNodeByLocalName ( String localName ) throws InvalidPDMLDocumentException {
+
+        String result = getTextOfUniqueTextChildNodeByLocalNameOrNull ( localName );
+        if ( result != null ) {
+            return result;
+        } else {
+            throw new InvalidPDMLDocumentException (
+                "MISSING_UNIQUE_TEXT_CHILD_NODE",
+                "Node '" + getName().fullName() + "' must have exactly one text child node with name '" + localName + "'.",
+                getName().getToken() );
+        }
+    }
+
+    public @Nullable String getTextOfUniqueTextChildNodeByLocalName ( String localName, TextErrorHandler errorHandler ) {
+
+        try {
+            return getTextOfUniqueTextChildNodeByLocalName ( localName );
+        } catch ( InvalidPDMLDocumentException e ) {
+            errorHandler.handleError ( e.getId(), e.getMessage(), e.getToken() );
+            return null;
+        }
+    }
+
+    /*
     public @Nullable String concatenateTextInChildNodes() {
 
         StringBuilder sb = new StringBuilder();
@@ -130,7 +206,45 @@ public class ASTNode { // implements ASTElement {
 
         return sb.length() == 0 ? null : sb.toString();
     }
+*/
+    public @Nullable String concatenateTextInChildNodes() {
 
+        return children == null ? null : children.concatenateTextElements();
+    }
+
+/*
+    public @NotNull String requireSingleTextContent() throws InvalidPDMLDocumentException {
+
+        if ( children == null ) throw new InvalidPDMLDocumentException (
+            "Node '" + name.toString() + "' cannot be empty.", name.getToken() );
+
+        if ( children.elementCount() != 1 ) throw new InvalidPDMLDocumentException (
+            "Node '" + name.toString() + "' must contain only text", name.getToken() );
+
+        if ( ! ( children.firstElement() instanceof Text_ASTNodeChild ) ) throw new InvalidPDMLDocumentException (
+            "Node '" + name.toString() + "' must contain only text", name.getToken() );
+
+        String result = concatenateTextInChildNodes();
+
+        if ( result == null ) throw new InvalidPDMLDocumentException (
+            "Node '" + name.toString() + "' must contain text", name.getToken() );
+
+        return result;
+    }
+*/
+    public @Nullable String getSingleTextContentOrNull() {
+
+        if ( children == null ) return null;
+
+        if ( children.elementCount() != 1 ) return null;
+
+        ASTNodeChild singleChild = children.firstElement();
+        if ( singleChild instanceof Text_ASTNodeChild textChild ) {
+            return textChild.getText();
+        } else {
+            return null;
+        }
+    }
 /*
         visit_tree__only_nodes ( node_consumer object_consumer<mutable_PDML_AST_node>, include_this_node yes_no )
 

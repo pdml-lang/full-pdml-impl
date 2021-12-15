@@ -1,6 +1,6 @@
 package dev.pdml.core.reader.reader;
 
-import dev.pdml.core.Constants;
+import dev.pdml.core.PDMLConstants;
 
 public class PXMLReaderHelper {
 
@@ -41,6 +41,6 @@ public class PXMLReaderHelper {
 
     public static boolean isEscapeCharacter ( char c ) {
 
-        return c == Constants.ESCAPE_CHARACTER;
+        return c == PDMLConstants.ESCAPE_CHARACTER;
     }
 }

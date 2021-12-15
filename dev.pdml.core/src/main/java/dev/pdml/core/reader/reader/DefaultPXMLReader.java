@@ -12,7 +12,7 @@ import dev.pp.text.resource.TextResource;
 import dev.pp.text.token.TextToken;
 import dev.pp.text.utilities.FileUtilities;
 import dev.pp.text.utilities.string.StringConstants;
-import dev.pdml.core.Constants;
+import dev.pdml.core.PDMLConstants;
 import dev.pdml.core.reader.exception.MalformedPXMLDocumentException;
 import dev.pp.text.reader.exception.TextReaderException;
 import dev.pdml.core.reader.exception.PXMLResourceException;
@@ -91,21 +91,21 @@ public class DefaultPXMLReader implements PXMLReader {
 
         handleExtension();
 
-        if ( ! isAtChar ( Constants.NODE_START ) ) return false;
+        if ( ! isAtChar ( PDMLConstants.NODE_START ) ) return false;
 
-        if ( isNextChar ( Constants.COMMENT_SYMBOL ) ) return false;
+        if ( isNextChar ( PDMLConstants.COMMENT_SYMBOL ) ) return false;
 
         return true;
     }
 
     public boolean consumeNodeEnd() throws PXMLResourceException {
 
-        return skipChar ( Constants.NODE_END );
+        return skipChar ( PDMLConstants.NODE_END );
     }
 
     public boolean isAtNodeEnd() throws PXMLResourceException {
 
-        return isAtChar ( Constants.NODE_END );
+        return isAtChar ( PDMLConstants.NODE_END );
     }
 
     // name
@@ -146,8 +146,8 @@ public class DefaultPXMLReader implements PXMLReader {
 
             handleExtension ();
 
-            if ( isAtChar ( Constants.NODE_START ) ||
-                isAtChar ( Constants.NODE_END ) ) break;
+            if ( isAtChar ( PDMLConstants.NODE_START ) ||
+                isAtChar ( PDMLConstants.NODE_END ) ) break;
 
             final char currentChar = currentChar();
             if ( PXMLReaderHelper.isEscapeCharacter ( currentChar ) ) {
@@ -200,8 +200,8 @@ public class DefaultPXMLReader implements PXMLReader {
 
         final char quoteChar = currentChar();
 
-        if ( quoteChar != Constants.ATTRIBUTE_VALUE_DOUBLE_QUOTE &&
-            quoteChar != Constants.ATTRIBUTE_VALUE_SINGLE_QUOTE ) return null;
+        if ( quoteChar != PDMLConstants.ATTRIBUTE_VALUE_DOUBLE_QUOTE &&
+            quoteChar != PDMLConstants.ATTRIBUTE_VALUE_SINGLE_QUOTE ) return null;
 
         final TextToken startToken = currentToken();
 
@@ -355,14 +355,14 @@ public class DefaultPXMLReader implements PXMLReader {
 
         if ( ! hasChar() ) return false;
 
-        return isAtString ( Constants.COMMENT_START );
+        return isAtString ( PDMLConstants.COMMENT_START );
     }
 
     private boolean isAtEndOfComment() throws PXMLResourceException {
 
         if ( ! hasChar() ) return false;
 
-        return isAtString ( Constants.COMMENT_END );
+        return isAtString ( PDMLConstants.COMMENT_END );
     }
 
     public void skipWhitespaceAndComments() throws PXMLResourceException, MalformedPXMLDocumentException {
@@ -726,7 +726,7 @@ public class DefaultPXMLReader implements PXMLReader {
 
         if ( ! hasChar() ) throw cancelingErrorAtCurrentLocation (
             "MISSING_ESCAPED_CHARACTER",
-            "Expecting another character after the escape character '" + Constants.ESCAPE_CHARACTER +
+            "Expecting another character after the escape character '" + PDMLConstants.ESCAPE_CHARACTER +
                 "' at the end of the document."
         );
 
@@ -755,12 +755,12 @@ public class DefaultPXMLReader implements PXMLReader {
                 return;
             default:
                 if ( ! forQuotedAttribute ) {
-                    if ( firstChar == Constants.ATTRIBUTES_START || firstChar == Constants.ATTRIBUTES_END ) {
+                    if ( firstChar == PDMLConstants.ATTRIBUTES_START || firstChar == PDMLConstants.ATTRIBUTES_END ) {
                         result.append ( firstChar );
                         return;
                     }
                 } else {
-                    if ( firstChar == Constants.ATTRIBUTE_VALUE_DOUBLE_QUOTE || firstChar == Constants.ATTRIBUTE_VALUE_SINGLE_QUOTE ) {
+                    if ( firstChar == PDMLConstants.ATTRIBUTE_VALUE_DOUBLE_QUOTE || firstChar == PDMLConstants.ATTRIBUTE_VALUE_SINGLE_QUOTE ) {
                         result.append ( firstChar );
                         return;
                     }
@@ -768,7 +768,7 @@ public class DefaultPXMLReader implements PXMLReader {
 
                 nonCancelingErrorAtCurrentLocation (
                     "INVALID_ESCAPED_CHARACTER",
-                    "Invalid character escape sequence \"" + Constants.ESCAPE_CHARACTER + firstChar + "\"." );
+                    "Invalid character escape sequence \"" + PDMLConstants.ESCAPE_CHARACTER + firstChar + "\"." );
         }
     }
 

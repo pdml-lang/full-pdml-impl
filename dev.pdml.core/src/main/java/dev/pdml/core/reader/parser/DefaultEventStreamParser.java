@@ -1,6 +1,6 @@
 package dev.pdml.core.reader.parser;
 
-import dev.pdml.core.Constants;
+import dev.pdml.core.PDMLConstants;
 import dev.pdml.core.data.AST.attribute.ASTNodeAttributes;
 import dev.pdml.core.data.AST.name.ASTNodeName;
 import dev.pdml.core.data.AST.name.ASTRawNodeName;
@@ -114,7 +114,7 @@ public class DefaultEventStreamParser<N, R> implements EventStreamParser<N, R> {
 
         ASTRawNodeName rawName = ParserHelper.requireRawNodeName ( reader, errorHandler );
         checkNameSeparator ( rawName );
-        boolean isEmptyNode = isAtChar ( Constants.NODE_END );
+        boolean isEmptyNode = isAtChar ( PDMLConstants.NODE_END );
 
         // TODO? also allow XML-like namespace declarations with attributes, e.g.  (xmlns:ch="http://www.example.com")
 
@@ -162,11 +162,11 @@ public class DefaultEventStreamParser<N, R> implements EventStreamParser<N, R> {
     private void checkNameSeparator ( @NotNull ASTRawNodeName name ) throws PXMLResourceException {
 
         boolean hasNameValueSeparator =
-            acceptChar ( Constants.NAME_VALUE_SEPARATOR )
-            || acceptChar ( Constants.TAB )
-            || isAtChar ( Constants.ATTRIBUTES_START )
-            || isAtChar ( Constants.NODE_END )
-            || isAtChar ( Constants.NODE_START )
+            acceptChar ( PDMLConstants.NAME_VALUE_SEPARATOR )
+            || acceptChar ( PDMLConstants.TAB )
+            || isAtChar ( PDMLConstants.ATTRIBUTES_START )
+            || isAtChar ( PDMLConstants.NODE_END )
+            || isAtChar ( PDMLConstants.NODE_START )
             || isAtEndOfLine();
 
         if ( ! hasNameValueSeparator ) {
@@ -179,7 +179,7 @@ public class DefaultEventStreamParser<N, R> implements EventStreamParser<N, R> {
     private ASTNamespaces parseDeclaredNamespaces() throws PXMLResourceException, TextReaderException {
 
         if ( peekFirstCharAfterOptionalSpacesTabsAndNewLines ( DEFAULT_LOOKAHEAD )
-            != Constants.NAMESPACE_DECLARATION_START_CHAR ) return null;
+            != PDMLConstants.NAMESPACE_DECLARATION_START_CHAR ) return null;
 
         skipSpacesAndTabsAndNewLines (); // TODO? skipWhitespaceAndComments();
         ASTNamespaces declaredNamespaces = ParserHelper.parseNamespaces ( reader, true, errorHandler );
@@ -202,7 +202,7 @@ public class DefaultEventStreamParser<N, R> implements EventStreamParser<N, R> {
                 String message = "Namespace '" +  prefix + "' has already been declared";
                 TextLocation location = existingNamespace.getLocation ();
                 if ( location != null ) message = message + " at" +
-                    Constants.NEW_LINE + location;
+                    PDMLConstants.NEW_LINE + location;
                 message = message + ".";
 
                 nonCancelingError (
@@ -262,7 +262,7 @@ public class DefaultEventStreamParser<N, R> implements EventStreamParser<N, R> {
 
         if ( ! lenientParsing ) {
 
-            if ( peekFirstCharAfterOptionalSpacesTabsAndNewLines ( DEFAULT_LOOKAHEAD ) == Constants.ATTRIBUTES_START ) {
+            if ( peekFirstCharAfterOptionalSpacesTabsAndNewLines ( DEFAULT_LOOKAHEAD ) == PDMLConstants.ATTRIBUTES_START ) {
                 skipSpacesAndTabsAndNewLines (); // TODO? skipWhitespaceAndComments();
                 attributes = ParserHelper.parseAttributesWithParenthesis (
                     reader, defaultAttributeName, namespaceGetter, true, errorHandler );

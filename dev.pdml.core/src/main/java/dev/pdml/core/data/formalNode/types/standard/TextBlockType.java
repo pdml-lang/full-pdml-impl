@@ -1,6 +1,6 @@
 package dev.pdml.core.data.formalNode.types.standard;
 
-import dev.pdml.core.Constants;
+import dev.pdml.core.PDMLConstants;
 import dev.pdml.core.data.AST.name.ASTNodeName;
 import dev.pdml.core.reader.exception.MalformedPXMLDocumentException;
 import dev.pdml.core.reader.exception.PXMLResourceException;
@@ -61,7 +61,7 @@ public class TextBlockType extends StringType {
 
         // now positioned at first line, first column of text
 
-        String endString = nodeName.fullName() + Constants.NODE_END;
+        String endString = nodeName.fullName() + PDMLConstants.NODE_END;
 
         List<String> lines = new ArrayList<>();
         while ( true ) {

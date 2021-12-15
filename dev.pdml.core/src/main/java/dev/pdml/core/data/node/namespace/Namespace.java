@@ -2,11 +2,10 @@ package dev.pdml.core.data.node.namespace;
 
 import dev.pp.text.annotations.NotNull;
 import dev.pp.text.annotations.Nullable;
-import dev.pdml.core.Constants;
+import dev.pdml.core.PDMLConstants;
 import dev.pdml.core.data.AST.namespace.ASTNamespace;
 
 import java.net.URI;
-import java.net.URISyntaxException;
 
 public class Namespace {
 
@@ -48,5 +47,5 @@ public class Namespace {
         return URI.hashCode();
     }
 
-    public @NotNull String toString() { return prefix + Constants.ATTRIBUTE_ASSIGN + URI; }
+    public @NotNull String toString() { return prefix + PDMLConstants.ATTRIBUTE_ASSIGN + URI; }
 }

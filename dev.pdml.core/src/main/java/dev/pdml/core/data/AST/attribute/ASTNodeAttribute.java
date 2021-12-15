@@ -1,6 +1,6 @@
 package dev.pdml.core.data.AST.attribute;
 
-import dev.pdml.core.Constants;
+import dev.pdml.core.PDMLConstants;
 import dev.pp.parameters.textTokenParameter.TextTokenParameter;
 import dev.pp.text.location.TextLocation;
 // import dev.pdml.core.data.AST.ASTElement;
@@ -94,7 +94,7 @@ public class ASTNodeAttribute { // implements ASTElement {
 
     public @NotNull String toString() {
 
-        return name.fullName() + " " + Constants.ATTRIBUTE_ASSIGN + " " + getValueText();
+        return name.fullName() + " " + PDMLConstants.ATTRIBUTE_ASSIGN + " " + getValueText();
     }
 
 /*

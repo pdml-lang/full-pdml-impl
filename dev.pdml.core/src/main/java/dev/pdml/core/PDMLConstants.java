@@ -5,7 +5,7 @@ import dev.pp.text.annotations.NotNull;
 import java.net.URI;
 import java.net.URISyntaxException;
 
-public class Constants {
+public class PDMLConstants {
 
     // node
     public static final char NODE_START = '[';
@@ -36,6 +36,8 @@ public class Constants {
 
     public static final char ESCAPE_CHARACTER = '\\';
     public static final char TAB = '\t';
+
+    public static final @NotNull String PDML_FILE_EXTENSION = "pdml";
 
     public static final @NotNull String NEW_LINE = System.getProperty ( "line.separator" );
 

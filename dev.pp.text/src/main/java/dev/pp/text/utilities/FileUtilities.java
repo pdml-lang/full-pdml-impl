@@ -164,6 +164,11 @@ public class FileUtilities {
     }
 */
 
+    public static @Nullable String readTextFromUTF8File ( File file ) throws IOException {
+
+        return Files.readString ( file.toPath() );
+    }
+
     public static @NotNull File createEmptyTempFile ( boolean deleteOnExit ) throws IOException {
 
         File file = Files.createTempFile ( null, null ).toFile();

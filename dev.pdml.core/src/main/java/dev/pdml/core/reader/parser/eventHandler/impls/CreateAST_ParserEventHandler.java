@@ -21,8 +21,7 @@ public class CreateAST_ParserEventHandler implements ParserEventHandler<ASTNode,
 
     public void onEnd () {}
 
-    public @NotNull
-    ASTNode onRootNodeStart ( @NotNull NodeStartEvent event ) {
+    public @NotNull ASTNode onRootNodeStart ( @NotNull NodeStartEvent event ) {
 
         // TODO declared namespaces
 
@@ -32,18 +31,16 @@ public class CreateAST_ParserEventHandler implements ParserEventHandler<ASTNode,
 
     public void onRootNodeEnd ( @NotNull NodeEndEvent event, @NotNull ASTNode rootNode ) {}
 
-    public @NotNull
-    ASTNode onNodeStart ( @NotNull NodeStartEvent event, @NotNull ASTNode parentNode ) {
+    public @NotNull ASTNode onNodeStart ( @NotNull NodeStartEvent event, @NotNull ASTNode parentNode ) {
 
         // TODO declared namespaces
 
         ASTNode node = newNode ( event.getName() );
-        parentNode.appendChildNode ( node );
+        parentNode.appendNodeChild ( node );
         return node;
     }
 
-    private @NotNull
-    ASTNode newNode ( @NotNull ASTNodeName name ) {
+    private @NotNull ASTNode newNode ( @NotNull ASTNodeName name ) {
 
         return new ASTNode ( name, null, null, null );
     }
@@ -65,9 +62,5 @@ public class CreateAST_ParserEventHandler implements ParserEventHandler<ASTNode,
         parentNode.appendCommentChild ( comment );
     }
 
-    public @NotNull
-    ASTNode getResult() {
-
-        return rootNode;
-    }
+    public @NotNull ASTNode getResult() { return rootNode; }
 }

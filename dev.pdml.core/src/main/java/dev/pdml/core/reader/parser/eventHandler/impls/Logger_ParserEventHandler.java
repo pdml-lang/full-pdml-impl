@@ -4,7 +4,7 @@ import dev.pp.text.token.TextToken;
 import dev.pp.text.utilities.FileUtilities;
 import dev.pp.text.utilities.string.StringTruncator;
 import dev.pp.text.utilities.string.StringUtils;
-import dev.pdml.core.Constants;
+import dev.pdml.core.PDMLConstants;
 import dev.pdml.core.data.AST.attribute.ASTNodeAttribute;
 import dev.pdml.core.data.AST.attribute.ASTNodeAttributes;
 import dev.pdml.core.data.AST.name.ASTNodeName;
@@ -210,7 +210,7 @@ public class Logger_ParserEventHandler implements ParserEventHandler<ASTNodeName
             write ( " / " + text.length () );
         }
 
-        write ( Constants.NEW_LINE );
+        write ( PDMLConstants.NEW_LINE );
 
         writer.flush();
     }

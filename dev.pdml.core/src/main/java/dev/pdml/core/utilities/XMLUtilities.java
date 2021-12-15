@@ -1,7 +1,7 @@
 package dev.pdml.core.utilities;
 
 import dev.pp.text.utilities.FileUtilities;
-import dev.pdml.core.Constants;
+import dev.pdml.core.PDMLConstants;
 import dev.pp.text.annotations.NotNull;
 import dev.pp.text.annotations.Nullable;
 import org.w3c.dom.Document;
@@ -34,7 +34,7 @@ public class XMLUtilities {
 
     public static @NotNull String getQualifiedNameForNamespaceAttribute ( @NotNull String namespacePrefix ) {
 
-        return XMLConstants.XMLNS_ATTRIBUTE + Constants.NAMESPACE_PREFIX_NAME_SEPARATOR + namespacePrefix;
+        return XMLConstants.XMLNS_ATTRIBUTE + PDMLConstants.NAMESPACE_PREFIX_NAME_SEPARATOR + namespacePrefix;
     }
 
     public static @NotNull Document XMLFileToXMLDocument ( @NotNull File XMLFile ) throws Exception {

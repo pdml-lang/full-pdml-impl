@@ -3,13 +3,12 @@ package dev.pdml.core.data.node.name;
 import dev.pp.text.annotations.NotNull;
 import dev.pp.text.annotations.Nullable;
 
-import dev.pdml.core.Constants;
+import dev.pdml.core.PDMLConstants;
 import dev.pdml.core.data.AST.name.ASTNodeName;
 import dev.pdml.core.data.AST.namespace.ASTNamespace;
 import dev.pdml.core.data.node.namespace.Namespace;
 
 import java.net.URI;
-import java.net.URISyntaxException;
 
 public class QualifiedNodeName extends NodeName {
 
@@ -61,7 +60,7 @@ public class QualifiedNodeName extends NodeName {
     public @NotNull String toString() {
 
         return namespace.getPrefix () +
-            Constants.NAMESPACE_PREFIX_NAME_SEPARATOR +
+            PDMLConstants.NAMESPACE_PREFIX_NAME_SEPARATOR +
             localName;
     }
 }

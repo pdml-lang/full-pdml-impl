@@ -20,12 +20,15 @@ dependencies {
     implementation project ( ':dev.pdml.core' )
 
     // support for scripting
-    implementation group: 'org.graalvm.js', name: 'js', version: '21.2.0'
+    implementation group: 'org.graalvm.js', name: 'js', version: '21.3.0'
+    implementation group: 'org.graalvm.truffle', name: 'truffle-api', version: '21.3.0'
+    // Needed only if the standard Java script API is used
+    // implementation group: 'org.graalvm.js', name: 'js-scriptengine', version: '21.3.0'
 }
 
 java {
     toolchain {
-        languageVersion = JavaLanguageVersion.of(11)
+        languageVersion = JavaLanguageVersion.of(17)
     }
 }
 

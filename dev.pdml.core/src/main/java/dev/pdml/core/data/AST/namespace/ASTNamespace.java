@@ -1,6 +1,6 @@
 package dev.pdml.core.data.AST.namespace;
 
-import dev.pdml.core.Constants;
+import dev.pdml.core.PDMLConstants;
 import dev.pdml.core.data.node.namespace.Namespace;
 import dev.pp.text.location.TextLocation;
 import dev.pp.text.annotations.NotNull;
@@ -56,7 +56,7 @@ public class ASTNamespace { // implements ASTElement {
 
     public @NotNull String toString() {
 
-        return getPrefixText() + Constants.ATTRIBUTE_ASSIGN + getURIText();
+        return getPrefixText() + PDMLConstants.ATTRIBUTE_ASSIGN + getURIText();
     }
 
 /*

@@ -1,6 +1,6 @@
 package dev.pdml.core.data.AST.namespace;
 
-import dev.pdml.core.Constants;
+import dev.pdml.core.PDMLConstants;
 import dev.pp.text.location.TextLocation;
 import dev.pp.text.annotations.NotNull;
 import dev.pp.text.annotations.Nullable;
@@ -18,8 +18,8 @@ public class ASTNamespaces {
 
         return new ASTNamespace (
             prefix,
-            new TextToken ( Constants.UNKNOWN_URI.toString(), location ),
-            Constants.UNKNOWN_URI );
+            new TextToken ( PDMLConstants.UNKNOWN_URI.toString(), location ),
+            PDMLConstants.UNKNOWN_URI );
     }
 
 
