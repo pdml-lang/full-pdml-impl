@@ -1,0 +1,33 @@
+plugins {
+    id 'dev.pdml.java-application-conventions'
+}
+
+dependencies {
+    // needed: commands, texttable
+    implementation fileTree ( dir: '../dependencies' )
+
+    implementation project ( ':pdml-ext' )
+
+    // Picocli
+    implementation 'info.picocli:picocli:4.6.3'
+    // optional; see https://picocli.info/#_annotation_processor
+    // annotationProcessor 'info.picocli:picocli-codegen:4.6.3'
+}
+
+application {
+    mainClass = 'dev.pdml.commands.Start'
+}
+
+// OS script file name to start the application
+tasks.startScripts {
+    applicationName = "pdml"
+}
+
+jar {
+    manifest {
+        attributes(
+            'Main-Class': 'dev.pdml.commands.Start',
+            'Class-Path': configurations.runtimeClasspath.files.collect { it.getName() }.join(' ')
+        )
+    }
+}

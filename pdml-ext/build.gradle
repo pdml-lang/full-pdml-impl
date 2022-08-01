@@ -1,0 +1,10 @@
+plugins {
+    id 'dev.pdml.java-library-conventions'
+}
+
+dependencies {
+    // needed: parameters, commands, scripting, texttable
+    implementation fileTree ( dir: '../dependencies' )
+
+    implementation project ( ':pdml-core' )
+}

@@ -1,14 +1,17 @@
-.gradle
-.idea
+# Gradle project-specific cache directory
+**/.gradle
 
-bin
-build
-gradle
-tests
+# IntelliJ Idea project-specific cache directory
+**/.idea
+
+# Gradle build output directory
+**/build
+
+# 'temp' directories
+**/temp
 
 # Directories and files starting with ---
 **/---*
 
 # Directories and files starting with NOGIT_
 **/NOGIT_*
-
