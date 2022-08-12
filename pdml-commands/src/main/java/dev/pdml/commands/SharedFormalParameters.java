@@ -47,7 +47,7 @@ public class SharedFormalParameters {
         @Nullable String examples ) {
 
         return FormalParameter.builder (
-                "output", CommonDataTypes.FILE_PATH_OR_NULL )
+            "output", CommonDataTypes.FILE_PATH_OR_NULL )
             .alternativeName ( "o" )
             .defaultValue ( null )
             .documentation ( title, description, examples )

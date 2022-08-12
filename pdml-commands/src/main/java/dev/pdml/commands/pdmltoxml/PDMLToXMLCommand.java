@@ -21,11 +21,13 @@ public class PDMLToXMLCommand {
 
     public static @NotNull FormalCommand<Void> COMMAND = FormalCommand.builder (
         "PDML_to_XML", PDMLToXMLCommand::execute )
-        .alternativeNames ( Set.of ( "PML_to_XML", "p2x" ) )
+        .alternativeNames ( Set.of ( "pdml2xml" ) )
         .inputParameters ( PDMLToXMLFormalParameters.FORMAL_PARAMETERS )
         .documentation ( "Convert PDML to XML",
-            "Convert a PDML/PML file into a standalone XML file.",
-            "pdml p2x input/doc.pdml output/doc.xml" )
+            """
+            Convert a PDML document into a standalone XML document.
+            Note: This command is not suitable to convert PML documents into XML.""",
+            "pdml pdml2xml input/doc.pdml output/doc.xml" )
         .build();
 
     public static Void execute (

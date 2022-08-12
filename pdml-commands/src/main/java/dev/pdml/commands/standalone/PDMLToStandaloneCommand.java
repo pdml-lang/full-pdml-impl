@@ -13,15 +13,17 @@ import java.io.Writer;
 import java.nio.file.Path;
 import java.util.Map;
 
-public class StandaloneCommand {
+public class PDMLToStandaloneCommand {
 
     public static @NotNull FormalCommand<Void> COMMAND = FormalCommand.builder (
-        "create_standalone", StandaloneCommand::execute )
-        .alternativeName ( "sa" )
+        "PDML_to_standalone", PDMLToStandaloneCommand::execute )
+        .alternativeName ( "pdml2sa" )
         .inputParameters ( StandaloneFormalParameters.FORMAL_PARAMETERS )
         .documentation ( "Create Standalone PDML",
-            "Convert a PDML/PML file into a standalone PDML/PML file.",
-            "pdml sa input/book.pml output/standalone_book.pml" )
+            """
+            Convert a PDML document into a standalone PDML document.
+            Note: This command is not suitable to convert PML documents into a standalone PDML document.""",
+            "pdml pdml2sa input/book.pml output/standalone_book.pml" )
         .build();
 
     public static Void execute (
