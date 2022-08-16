@@ -1,7 +1,7 @@
 package dev.pdml.core.data.formalNode;
 
 import dev.pp.parameters.formalParameter.FormalParameter;
-import dev.pp.parameters.formalParameter.list.FormalParameters;
+import dev.pp.parameters.formalParameter.FormalParameters;
 import dev.pp.basics.annotations.NotNull;
 import dev.pp.basics.annotations.Nullable;
 import dev.pdml.core.data.node.name.NodeName;

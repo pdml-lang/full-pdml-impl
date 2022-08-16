@@ -88,7 +88,7 @@ public class AppendToTextTokenParameters_ParserEventHandler
         }
 
         for ( ASTNodeAttribute attribute : attributes.getList () ) {
-            textTokenParameters.add ( attribute.getName().getToken(), attribute.getValue() );
+            textTokenParameters.add ( attribute.toTextParameter() );
         }
     }
 

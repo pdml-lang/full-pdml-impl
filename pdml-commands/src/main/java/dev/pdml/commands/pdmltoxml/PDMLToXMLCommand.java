@@ -8,7 +8,7 @@ import dev.pp.basics.utilities.SimpleLogger;
 import dev.pp.basics.utilities.directory.DirectoryCreator;
 import dev.pp.basics.utilities.file.TextFileIO;
 import dev.pp.commands.command.FormalCommand;
-import dev.pp.parameters.parameter.list.Parameters;
+import dev.pp.parameters.parameter.Parameters;
 import dev.pp.text.resource.File_TextResource;
 
 import java.io.Reader;

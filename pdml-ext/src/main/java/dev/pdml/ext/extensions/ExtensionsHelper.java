@@ -4,7 +4,7 @@ import dev.pdml.core.reader.PDMLReader;
 import dev.pp.basics.utilities.directory.DirectoryConfig;
 import dev.pp.basics.utilities.file.FilePathUtils;
 import dev.pp.basics.utilities.os.OSDirectories;
-import dev.pp.parameters.parameter.list.Parameters;
+import dev.pp.parameters.parameter.Parameters;
 import dev.pp.basics.annotations.NotNull;
 import dev.pp.basics.annotations.Nullable;
 import dev.pp.text.error.handler.TextErrorHandler;

@@ -3,7 +3,7 @@ package dev.pdml.commands.pdmltoxml;
 import dev.pdml.commands.SharedFormalParameters;
 import dev.pp.basics.annotations.NotNull;
 import dev.pp.parameters.formalParameter.FormalParameter;
-import dev.pp.parameters.formalParameter.list.FormalParameters;
+import dev.pp.parameters.formalParameter.FormalParameters;
 
 import java.nio.file.Path;
 

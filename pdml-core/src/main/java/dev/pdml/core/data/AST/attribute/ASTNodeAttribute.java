@@ -3,7 +3,6 @@ package dev.pdml.core.data.AST.attribute;
 import dev.pdml.core.PDMLConstants;
 import dev.pp.parameters.textTokenParameter.TextTokenParameter;
 import dev.pp.text.location.TextLocation;
-// import dev.pdml.core.data.AST.ASTElement;
 import dev.pdml.core.data.AST.name.ASTNodeName;
 import dev.pdml.core.data.AST.namespace.ASTNamespace;
 import dev.pp.basics.annotations.NotNull;
@@ -87,7 +86,7 @@ public class ASTNodeAttribute { // implements ASTElement {
     public @NotNull TextTokenParameter toTextParameter() {
 
         return new TextTokenParameter (
-            new TextToken ( name.qualifiedName (), name.getLocation() ),
+            new TextToken ( name.qualifiedName(), name.getLocation() ),
             value );
     }
 

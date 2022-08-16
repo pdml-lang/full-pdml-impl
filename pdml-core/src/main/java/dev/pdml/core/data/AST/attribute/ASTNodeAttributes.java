@@ -1,8 +1,8 @@
 package dev.pdml.core.data.AST.attribute;
 
-import dev.pp.parameters.formalParameter.list.FormalParameters;
-import dev.pp.parameters.parameter.list.Parameters;
-import dev.pp.parameters.parameter.list.ParametersCreator;
+import dev.pp.parameters.formalParameter.FormalParameters;
+import dev.pp.parameters.parameter.Parameters;
+import dev.pp.parameters.parameter.ParametersCreator;
 import dev.pp.parameters.textTokenParameter.TextTokenParameter;
 import dev.pp.parameters.textTokenParameter.TextTokenParameters;
 import dev.pp.basics.annotations.NotNull;
