@@ -13,7 +13,7 @@ dependencies {
     // optional; see https://picocli.info/#_annotation_processor
     // annotationProcessor 'info.picocli:picocli-codegen:4.6.3'
 
-    implementation group: 'org.graalvm.js', name: 'js', version: '22.1.0'
+    implementation group: 'org.graalvm.js', name: 'js', version: '22.2.0'
 }
 
 application {
