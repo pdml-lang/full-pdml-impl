@@ -18,6 +18,7 @@ dependencies {
 
 application {
     mainClass = 'dev.pdml.commands.Start'
+    applicationDefaultJvmArgs = ['-ea'] // enable assertions
 }
 
 // OS script file name to start the application
