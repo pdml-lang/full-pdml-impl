@@ -436,7 +436,7 @@ public class PDMLReaderImpl implements PDMLReader {
 
     public boolean appendCharWhile ( CharPredicate predicate, StringBuilder sb ) throws IOException {
         // if ( ! hasChar () ) return false;
-        return charReader.appendCurrentCharWhile ( predicate, sb );
+        return charReader.appendWhile ( predicate, sb );
     }
 
     public boolean appendOptionalNewLine ( StringBuilder sb ) throws IOException {
@@ -526,7 +526,7 @@ public class PDMLReaderImpl implements PDMLReader {
     public @Nullable String readUntilEndOfLine ( boolean includeNewLine ) throws IOException {
 
         StringBuilder sb = new StringBuilder();
-        charReader.appendCurrentCharWhile ( CharChecks::isNotNewLine, sb );
+        charReader.appendWhile ( CharChecks::isNotNewLine, sb );
         if ( includeNewLine ) {
             String newLine = readOptionalNewLine();
             if ( newLine != null ) sb.append ( newLine );

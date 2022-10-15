@@ -19,17 +19,17 @@ class PDMLStringMapParserTest {
                 [a2 v2 v2
                     line 2
                     end]
-                
+
                 [- comment a3 -]
                 [a3]
-                
+
                 [a4  ]
-                
+
                 [- comment a5 -]
                 [a5 ]
             ]
             """;
-        Map<String, String> result = StringMapPDMLParser.parse ( code );
+        Map<String, String> result = StringMapPDMLParser.parseString ( code, true );
         assertNotNull ( result );
         assertEquals ( 5, result.size() );
         assertEquals ( "v1", result.get ( "a1" ) );
@@ -42,11 +42,11 @@ class PDMLStringMapParserTest {
         assertEquals ( " ", result.get ( "a4" ) );
         assertNull ( result.get ( "a5" ) );
 
-        assertNull ( StringMapPDMLParser.parse ( "[config]" ) );
+        assertNull ( StringMapPDMLParser.parseString ( "[config]", true ) );
 
-        assertNull ( StringMapPDMLParser.parse ( "[config   [- comment-] ]" ) );
+        assertNull ( StringMapPDMLParser.parseString ( "[config   [- comment-] ]", true ) );
 
-        result = StringMapPDMLParser.parse ( "[config [a1]]" );
+        result = StringMapPDMLParser.parseString ( "[config [a1]]", true );
         assertNotNull ( result );
         assertTrue ( result.containsKey ( "a1" ) );
         assertNull ( result.get ( "a1" ) );
@@ -60,21 +60,21 @@ class PDMLStringMapParserTest {
                 [a1 v2]
             ]
             """;
-        assertThrows ( Exception.class, () -> StringMapPDMLParser.parse ( code_2 ) );
+        assertThrows ( Exception.class, () -> StringMapPDMLParser.parseString ( code_2, true ) );
 
         // child nodes not allowed
         final String code_3 = """
             [config
                 [size [width=10]]
             """;
-        assertThrows ( Exception.class, () -> StringMapPDMLParser.parse ( code_3 ) );
+        assertThrows ( Exception.class, () -> StringMapPDMLParser.parseString ( code_3, true ) );
 
         // attributes not allowed
         final String code_4 = """
             [config
                 [length (unit=cm) 100]
             """;
-        assertThrows ( Exception.class, () -> StringMapPDMLParser.parse ( code_4 ) );
+        assertThrows ( Exception.class, () -> StringMapPDMLParser.parseString ( code_4, true ) );
 
         // text in root node not allowed
         final String code_5 = """
@@ -82,6 +82,6 @@ class PDMLStringMapParserTest {
                 text
                 [a1 v1]
             """;
-        assertThrows ( Exception.class, () -> StringMapPDMLParser.parse ( code_5 ) );
+        assertThrows ( Exception.class, () -> StringMapPDMLParser.parseString ( code_5, true ) );
     }
 }
