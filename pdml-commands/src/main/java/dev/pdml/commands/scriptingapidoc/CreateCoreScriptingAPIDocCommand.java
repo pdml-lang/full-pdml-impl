@@ -1,34 +1,31 @@
 package dev.pdml.commands.scriptingapidoc;
 
-import dev.pdml.ext.utilities.scriptingapidoc.ScriptingAPIDocCreator;
+import dev.pdml.utils.scriptingapidoc.ScriptingAPIDocCreator;
 import dev.pp.basics.annotations.NotNull;
 import dev.pp.basics.annotations.Nullable;
-import dev.pp.commands.command.FormalCommand;
-import dev.pp.parameters.parameter.Parameters;
+import dev.pp.commands.command.CommandSpec;
+import dev.pp.parameters.parameters.Parameters;
 
 import java.nio.file.Path;
-import java.util.Map;
 
 public class CreateCoreScriptingAPIDocCommand {
 
-    public static @NotNull FormalCommand<Void> COMMAND = FormalCommand.builder (
+    public static final @NotNull CommandSpec<Path,Void> COMMAND_SPEC = CommandSpec.builder (
         "create_core_scripting_API_doc", CreateCoreScriptingAPIDocCommand::execute )
         .alternativeName ( "cad" )
-        .inputParameters ( ScriptingAPIDocFormalParameters.PARAMETERS )
+        .inputParameters ( ScriptingAPIDocParameters.SPECS )
         .documentation (
         "Create Core Scripting API Documentation",
             null,
             null )
         .build();
 
-    public static Void execute (
-        @Nullable Map<String, String> stringParameters,
-        @Nullable Parameters parameters ) throws Exception {
+    public static Void execute ( @Nullable Parameters<Path> parameters ) throws Exception {
 
         assert parameters != null;
 
-        @NotNull Path sourcesDirectory = parameters.getNonNull ( ScriptingAPIDocFormalParameters.SOURCE_DIRECTORY );
-        @NotNull Path outputFile = parameters.getNonNull ( ScriptingAPIDocFormalParameters.OUTPUT_FILE );
+        @NotNull Path sourcesDirectory = parameters.nonNullValue ( ScriptingAPIDocParameters.SOURCE_DIRECTORY );
+        @NotNull Path outputFile = parameters.nonNullValue ( ScriptingAPIDocParameters.OUTPUT_FILE );
 
         ScriptingAPIDocCreator.createCoreDoc ( sourcesDirectory, outputFile );
 

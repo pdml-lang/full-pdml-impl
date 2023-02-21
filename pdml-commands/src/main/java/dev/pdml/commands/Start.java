@@ -7,7 +7,7 @@ public class Start {
     public static void main ( String[] args ) {
 
         init();
-        int exitCode = PDMLCommands.runCommand ( args );
+        int exitCode = PdmlCommands.runCommand ( args );
         System.exit ( exitCode );
     }
 

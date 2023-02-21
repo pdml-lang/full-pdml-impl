@@ -3,8 +3,11 @@ plugins {
 }
 
 dependencies {
-    // needed: parameters, commands, scripting, texttable
     implementation fileTree ( dir: '../dependencies' )
+    // implementation fileTree ( dir: '../dependencies', include: 'pp-basics*.jar')
 
-    implementation project ( ':pdml-core' )
+    api project ( ':pdml-ext-shared' )
+    api project ( ':pdml-ext-utils' )
+    api project ( ':pdml-ext-types' )
+    api project ( ':pdml-ext-scripting' )
 }

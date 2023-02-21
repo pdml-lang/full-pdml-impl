@@ -1,0 +1,12 @@
+plugins {
+    id 'dev.pdml.java-library-conventions'
+}
+
+dependencies {
+    implementation fileTree ( dir: '../dependencies' )
+    // implementation fileTree ( dir: '../dependencies', include: 'pp-basics*.jar')
+
+    api project ( ':pdml-shared' )
+    api project ( ':pdml-data' )
+    api project ( ':pdml-reader' )
+}

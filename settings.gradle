@@ -3,8 +3,20 @@
  * in the user manual at https://docs.gradle.org/7.4/userguide/multi_project_builds.html
  */
 
-rootProject.name = 'pdml-java-impl'
-include ( 'pdml-core', 'pdml-ext', 'pdml-commands' )
+rootProject.name = 'full-pdml-impl'
+include ( 'pdml-shared',
+    'pdml-data',
+    'pdml-reader',
+    'pdml-parser',
+    'pdml-writer',
+    'pdml-ext-shared',
+    'pdml-ext-utils',
+    'pdml-ext-types',
+    'pdml-ext-scripting',
+    'pdml-ext',
+    'pdml-utils',
+    'pdml-xml',
+    'pdml-commands' )
 
 /*
 String PPDevRootDir = '../../../PP/dev/'
