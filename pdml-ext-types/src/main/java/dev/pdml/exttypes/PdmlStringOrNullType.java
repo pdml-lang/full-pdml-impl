@@ -15,9 +15,13 @@ import java.io.IOException;
 public class PdmlStringOrNullType extends PdmlType<String> {
 
     // public PDMLStringOrNullType ( @NotNull DataType<String> parameterType ) { super ( parameterType ); }
+    private final boolean escapeText;
 
-    public PdmlStringOrNullType () {
+//    public PdmlStringOrNullType () { super ( CommonDataTypes.STRING_OR_NULL ); }
+
+    public PdmlStringOrNullType ( boolean escapeText ) {
         super ( CommonDataTypes.STRING_OR_NULL );
+        this.escapeText = escapeText;
     }
 
 
@@ -29,7 +33,9 @@ public class PdmlStringOrNullType extends PdmlType<String> {
 
     public void insertPDMLObject ( @Nullable String string, @NotNull PdmlReader reader, @Nullable TextToken errorToken ) {
 
-        if ( string != null )
-            reader.insertStringToRead ( PdmlEscaper.escapeNodeText ( string ) );
+        if ( string != null ) {
+            String code = escapeText ? PdmlEscaper.escapeNodeText ( string ) : string;
+            reader.insertStringToRead ( code );
+        }
     }
 }

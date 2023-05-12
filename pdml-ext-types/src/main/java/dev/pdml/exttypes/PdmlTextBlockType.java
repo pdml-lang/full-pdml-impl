@@ -7,6 +7,7 @@ import dev.pp.basics.annotations.NotNull;
 import dev.pp.basics.annotations.Nullable;
 import dev.pp.basics.utilities.character.CharChecks;
 import dev.pp.basics.utilities.string.StringBuilderUtils;
+import dev.pp.datatype.CommonDataTypes;
 import dev.pp.text.inspection.TextErrorException;
 import dev.pp.text.token.TextToken;
 
@@ -31,6 +32,16 @@ public class PdmlTextBlockType extends PdmlStringOrNullType {
             || c == DELIMITER_CHAR_2
             || c == DELIMITER_CHAR_3;
     }
+
+
+    public PdmlTextBlockType ( boolean escapeText ) {
+        super ( escapeText );
+    }
+
+    public PdmlTextBlockType() {
+        this ( true );
+    }
+
 
     public @Nullable String readPDMLObject ( @NotNull PdmlReader reader, @NotNull NodeName nodeName )
         throws IOException, TextErrorException {

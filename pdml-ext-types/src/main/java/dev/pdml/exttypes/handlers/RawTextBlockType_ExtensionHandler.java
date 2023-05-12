@@ -30,7 +30,7 @@ public class RawTextBlockType_ExtensionHandler implements PdmlExtensionNodeHandl
     public void handleNode ( @NotNull PdmlExtensionsContext context, @NotNull NodeName nodeName )
         throws IOException, TextErrorException, DataValidatorException {
 
-        PdmlTextBlockType type = new PdmlTextBlockType ();
+        PdmlTextBlockType type = new PdmlTextBlockType();
         TypeExtensionHandlerHelper.handleTypeNode ( context, type, nodeName );
     }
 }
