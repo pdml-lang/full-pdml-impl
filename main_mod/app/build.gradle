@@ -9,13 +9,13 @@ plugins {
     // https://gradleup.com/shadow/getting-started/#default-java-groovy-tasks
     /*
         Note: creates
-            distributions\app-shadow-0.37.0.zip"
-            and distributions\app-shadow-0.37.0.tar"
+            distributions\app-shadow-x.xx.x.zip"
+            and distributions\app-shadow-x.xx.x.tar"
      */
     id 'com.gradleup.shadow' version '9.0.0-beta11'
 }
 
-version = '0.37.0'
+version = '0.78.0'
 
 repositories {
     mavenCentral()

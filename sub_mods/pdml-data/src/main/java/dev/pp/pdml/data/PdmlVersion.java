@@ -8,8 +8,8 @@ public class PdmlVersion {
     // public static @NotNull String APPLICATION_NAME_WITHOUT_SPACES = APPLICATION_NAME.replace ( ' ', '_' );
     public static @NotNull String APPLICATION_SHORT_NAME = "PDMLC";
 
-    public static @NotNull String VERSION = "0.37.0";
-    public static @NotNull String VERSION_DATE = "2025-03-20";
+    public static @NotNull String VERSION = "0.78.0";
+    public static @NotNull String VERSION_DATE = "2025-03-21";
     public static @NotNull String VERSION_TEXT = APPLICATION_SHORT_NAME + " " + VERSION + " " + VERSION_DATE;
 
     /* currently not used
