@@ -4,4 +4,4 @@ This repository contains the source code files of the PDML reference implementat
 
 All PDML extensions are implemented, but they are all experimental. Therefore this implementation is much more elaborate than a simple implementation supporting only Core PDML (without extensions).
 
-For more information about PDML please visit its [website](https://pdml-lang.dev/).
+For more information about PDML visit the [website](https://pdml-lang.dev/).
