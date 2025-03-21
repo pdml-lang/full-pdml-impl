@@ -1,0 +1,45 @@
+plugins {
+    id 'java'
+}
+
+repositories {
+    mavenCentral()
+}
+
+dependencies {
+    testImplementation 'org.junit.jupiter:junit-jupiter:5.9.2'
+    testRuntimeOnly("org.junit.platform:junit-platform-launcher")
+}
+
+java {
+/*
+    toolchain {
+        languageVersion = JavaLanguageVersion.of(17)
+    }
+ */
+    sourceCompatibility = "17"
+    targetCompatibility = "17"
+}
+
+test {
+    useJUnitPlatform()
+    // jvmArgs += "--enable-preview"
+}
+
+// version = '0.57.0'
+
+tasks.withType(JavaCompile) {
+    // options.compilerArgs += '-Xlint:preview'
+    // options.compilerArgs += '--enable-preview'
+
+    options.compilerArgs += '--release'
+    options.compilerArgs += '17'
+    options.compilerArgs += '-Xlint:deprecation'
+    options.compilerArgs += '-Xlint:unchecked'
+}
+
+/*
+tasks.withType(JavaExec) {
+    jvmArgs += '--enable-preview'
+}
+ */

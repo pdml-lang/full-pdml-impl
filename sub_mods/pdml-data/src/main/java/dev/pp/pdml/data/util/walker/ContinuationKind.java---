@@ -1,0 +1,6 @@
+package dev.pdml.data.util.walker;
+
+public enum ContinuationKind {
+
+    CONTINUE, ABORT, SKIP   // TODO? , SKIP_NEXT_SIBLINGS
+}

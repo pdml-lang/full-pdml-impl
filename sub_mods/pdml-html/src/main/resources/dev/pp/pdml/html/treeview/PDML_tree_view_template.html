@@ -1,0 +1,757 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <meta name="author" content="Christian Neumanns">
+        
+        <title>PDML Tree View (alpha)</title>
+        
+        <style>
+
+            * {
+                font-size: 14px;
+                box-sizing: border-box; /* see https://www.w3schools.com/css/css3_box-sizing.asp */
+                /*
+                margin: 0;
+                padding: 0;
+                */
+            }
+
+            html, body {
+                font-family: Arial, Helvetica, sans-serif;
+
+                height: 100%;
+                margin: 0;
+                padding: 0;
+                /* overflow: hidden; */
+            }
+
+            .code {
+                font-family: Consolas, Monaco, "Lucida Console", "DejaVu Sans Mono", "Courier New";
+                /* font-size: 12px; */
+            }
+
+
+            /* Split Panel */
+
+            .split-panel {
+                display: flex;
+            }
+
+            .split-panel-left-side, .split-panel-right-side {
+                height: 100vh;
+                padding: 0.5em;
+                overflow: auto;
+            }
+
+            .split-panel-left-side {
+                width: 30%;
+            }
+
+            .split-panel-right-side {
+                width: 70%;
+            }
+
+            .split-panel-slider {
+                width: 10px;
+                background-color: #ddd;
+                cursor: col-resize;
+            }
+            
+
+            /* Tree View */
+
+            #tree-toolbar {
+                background-color: #eee;
+                border-radius: 5px;
+                padding: 0.3em;
+            }
+
+            #tree-toolbar button {
+                font-size: 0.8em;
+            }
+
+            #tree-view {
+                margin-left: -1em;
+            }
+
+            #tree-view ul {
+                /* indent of children */
+                padding-inline-start: 1.3em;
+            }
+
+            #tree-view li {
+                list-style-type: none;
+                margin-top: 0.1em;
+            }
+
+            .tree-node-collapsed {
+                display: none;
+            }
+
+            .tree-node-expanded {
+                display: block;
+            }
+
+            .tree-node {
+                display: flex;
+                align-items: center;
+                flex-wrap: nowrap;
+                white-space: nowrap;
+            }
+
+            .tree-node-expander {
+                width: 1em;
+                min-width: 1em;
+                font-size: 0.8em;
+                margin-right: 0.3em;
+                cursor: pointer;
+                /* color: gray; */
+            }
+
+            .tree-node-icon {
+                width: 1.3em;
+                min-width: 1.3em;
+                height: 1.3em;
+                font-size: 0.7em;
+                /* font-weight: bold; */
+
+                /* border: 1px solid black; */
+                border-radius: 3px;
+
+                display: flex;
+                justify-content: center; /* center horizontally */
+                align-items: center;    /* center vertically */
+            }
+
+            /* https://htmlcolorcodes.com/color-chart/ */
+
+            .tagged-branch-node-icon {
+                background-color: #ebdef0;
+                border: 1px solid  #af7ac5;
+            }
+
+            .tagged-leaf-node-icon {
+                background-color: white;
+                border: 1px solid  #af7ac5;
+            }
+
+            .tree-node-text-icon {
+                background-color: #d5f5e3;
+                border: 1px solid #2ecc71;
+            }
+
+            .tree-node-whitespace-icon {
+                background-color: white;
+                border: 1px solid #2ecc71;
+            }
+
+            .tree-node-comment-icon {
+                background-color: #fff59d;
+                border: 1px solid #fdd835;
+            }
+
+            .tree-node-label {
+                /* font-size: 1em; */
+                margin-left: 0.3em;
+                cursor: pointer;
+            }
+
+
+            /* Node Detail Panels */
+
+            .node-detail-panel {
+            }
+
+            .node-detail-title {
+                background-color:#eee;
+                border-radius: 5px;
+                padding: 0.2em;
+                margin-bottom: 0.5em;
+            }
+
+            .node-detail-content {
+                margin-bottom: 1em;
+                white-space: pre;
+            }
+
+
+            /* Tables */
+
+            table {
+                border-collapse: collapse;                
+            }
+
+            table, th, td {
+                border: 1px solid lightgrey;
+            }
+
+            th, td {
+                padding: 0.2em;
+            }
+        </style>
+    </head>
+    
+    <body onload="init()">
+
+        <div class="split-panel">
+
+            <div class="split-panel-left-side">
+
+                <div id="tree-toolbar">
+                    <button onclick="expandAllTreeNodes()">Expand all</button> 
+                    <button onclick="collapseAllTreeNodes()">Collapse all</button> 
+                </div>
+
+                <div id="tree-view" class="code"></div>
+            </div>
+            
+            <div class="split-panel-slider"></div>
+            
+            <div class="split-panel-right-side">
+
+                <div class="node-detail-panel">
+                    <details id="node-path-panel" open>
+                        <summary class="node-detail-title">Path</summary>
+                        <div id="node-path-content" class="code node-detail-content"></div>
+                    </details>
+                </div>
+
+                <div class="node-detail-panel">
+                    <details id="node-attributes-panel" open>
+                        <summary class="node-detail-title">Attributes</summary>
+                        <div id="node-attributes-content" class="code node-detail-content"></div>
+                    </details>
+                </div>
+
+                <div class="node-detail-panel">
+                    <details id="node-child-nodes-panel" open>
+                        <summary class="node-detail-title">Child Nodes</summary>
+                        <div id="node-child-nodes-content" class="code node-detail-content"></div>
+                    </details>
+                </div>
+
+                <div class="node-detail-panel">
+                    <details id="node-text-panel" open>
+                        <summary class="node-detail-title">Text</summary>
+                        <div id="node-text-content" class="code node-detail-content"></div>
+                    </details>
+                </div>
+            </div>
+        </div>
+        
+
+        <script>
+
+            function init() {
+
+                initSplitPanel();
+                createTreeView();
+
+                document.getElementById ( "node-path-panel" ).style.display = "none";
+                document.getElementById ( "node-attributes-panel" ).style.display = "none";
+                document.getElementById ( "node-child-nodes-panel" ).style.display = "none";
+                document.getElementById ( "node-text-panel" ).style.display = "none";
+            }
+
+            function initSplitPanel() {
+
+                const splitPanelSlider = document.querySelector ( '.split-panel-slider' );
+                splitPanelSlider.isResizing = false;
+
+                splitPanelSlider.addEventListener ( 'mousedown', (e) => {
+                    // isResizingSplitPanel = true;
+                    splitPanelSlider.isResizing = true;
+                });
+
+                splitPanelSlider.addEventListener ( 'mouseup', () => {
+                    // isResizingSplitPanel = false;
+                    splitPanelSlider.isResizing = false;
+                });
+
+                document.addEventListener ( 'mousemove', (e) => {
+                    
+                    // if ( ! isResizingSplitPanel ) return;
+                    if ( ! splitPanelSlider.isResizing ) return;
+                    
+                    const containerRect = document.querySelector('.split-panel').getBoundingClientRect();
+                    const sliderPosition = e.clientX - containerRect.left;
+
+                    const leftPanelWidthPercent = (sliderPosition / containerRect.width) * 100;
+                    const rightPanelWidthPercent = 100 - leftPanelWidthPercent;
+
+                    document.querySelector('.split-panel-left-side').style.width = leftPanelWidthPercent + '%';
+                    document.querySelector('.split-panel-right-side').style.width = rightPanelWidthPercent + '%';
+
+                    splitPanelSlider.style.left = leftPanelWidthPercent + '%';
+                });
+            }
+
+
+            // Create Tree View
+
+            function createTreeView() {
+
+                const rootData = pdmlTreeData;
+                
+                // rootData.parentNode = null;
+                
+                const treeUl = document.createElement ( "ul" );
+                const rootLi = createTaggedNodeLi ( rootData );
+                treeUl.appendChild ( rootLi );
+                // return treeUl;
+                document.getElementById ( "tree-view" ).appendChild ( treeUl );
+            }
+
+            function createTaggedNodeLi ( taggedNodeData ) {
+
+                const isLeafNode = isTaggedLeafNode ( taggedNodeData );
+                const iconClass = isLeafNode ? "tagged-leaf-node-icon" : "tagged-branch-node-icon";
+                const labelText = replaceLinebreakChars ( taggedNodeData.tag );
+                const iconLetter = isLeafNode ? "L" : "B";
+                const taggedNodeLi = createTreeNodeLi ( taggedNodeData, iconClass, iconLetter, labelText, taggedNodeData.childNodes );
+
+                const childNodesUl = createChildNodesUl ( taggedNodeData );
+                if ( childNodesUl != null ) {
+                    taggedNodeLi.appendChild ( childNodesUl );
+                }
+                return taggedNodeLi;
+            }
+
+            function createChildNodesUl ( parentData ) {
+
+                if ( ! parentData.childNodes ) {
+                    return null;
+                }
+
+                const ul = document.createElement ( "ul" );
+                ul.classList.add ( "tree-node-collapsed" );
+                
+                for ( const childData of parentData.childNodes ) {
+                    
+                    // childData.parentNode = parentData;
+                    
+                    var childLi;
+                    switch ( childData.type ) {
+                        case "tagged":
+                            childLi = createTaggedNodeLi ( childData );
+                            break;
+                        case "text":
+                            const isWS = isWhitespace ( childData.text );
+                            const iconClass = isWS ? "tree-node-whitespace-icon" : "tree-node-text-icon";
+                            const labelText = isWS ? replaceWhitespaceChars ( childData.text, false ) : replaceLinebreakChars ( childData.text );
+                            childLi = createTreeNodeLi ( childData, iconClass, "T", labelText, false );
+                            break;
+                        case "comment":
+                            childLi = createTreeNodeLi ( childData, "tree-node-comment-icon", "C", childData.text, false );
+                            break;
+                        default:
+                            error ( "Unexpected childType " + childData.type );
+                    }
+                    
+                    ul.appendChild ( childLi );
+                }
+                
+                return ul;
+            }
+
+            function createTreeNodeLi ( nodeData, iconClass, iconText, labelText, showExpander ) {
+
+                const expanderText = showExpander ? "▶" : "";
+                const htmlCode = `<li>
+    <div class="tree-node">
+        <div class="tree-node-expander">${expanderText}</div>
+        <div class="tree-node-icon ${iconClass}">${iconText}</div>
+        <div class="tree-node-label"></div>
+    </div>
+</li>`;
+                const li = createElementFromHTML ( "div", htmlCode );
+                li.nodeData = nodeData;
+
+                if ( showExpander ) {
+
+                    const expanderDiv = li.querySelector ( ".tree-node-expander" );
+                    expanderDiv.addEventListener ( "click", expanderClickedHandler );
+                    
+                    li.expandNode = () => {
+                        expandOrCollapseTreeNode ( li, "tree-node-expanded", "tree-node-collapsed", "▼" )
+                    }
+
+                    li.collapseNode = () => {
+                        expandOrCollapseTreeNode ( li, "tree-node-collapsed", "tree-node-expanded", "▶" )
+                    }
+                }
+                
+                const label = li.querySelector ( ".tree-node-label" );
+                label.innerText = stringToSinglelineText ( labelText, 25 )
+                label.addEventListener ( "click", nodeLabelClickedHandler );
+
+                return li;
+            }
+
+
+            // Expand/Collapse Tree Nodes
+
+            function expanderClickedHandler ( event ) {
+
+                const li = event.target.parentElement.parentElement;
+                const childUl = li.querySelector ( "ul" );
+                if ( childUl ) {
+                    if ( childUl.classList.contains ( "tree-node-collapsed" ) ) {
+                        li.expandNode();
+                    } else {
+                        li.collapseNode();
+                    }
+                }
+            }
+
+            function expandOrCollapseTreeNode ( li, classToAdd, classToRemove, expanderText ) {
+
+                const childUl = li.querySelector ( "ul" );
+                if ( childUl ) {
+                    childUl.classList.add ( classToAdd );
+                    childUl.classList.remove ( classToRemove );
+                }
+                const expanderDiv = li.querySelector ( ".tree-node-expander" );
+                // expanderDiv.textContent = expanderText;
+                expanderDiv.innerText = expanderText;
+            }
+
+            function expandAllTreeNodes() {
+
+                const treeDiv = document.getElementById ( "tree-view" );
+                iterateOverTree ( treeDiv, child => {
+                    if ( child.tagName === "LI" ) {
+                        if ( child.expandNode ) {
+                            child.expandNode();
+                        }
+                    }
+                });
+            }
+
+            function collapseAllTreeNodes() {
+
+                const treeDiv = document.getElementById ( "tree-view" );
+                iterateOverTree ( treeDiv, child => {
+                    if ( child.tagName === "LI" ) {
+                        if ( child.collapseNode ) {
+                            child.collapseNode();
+                        }
+                    }
+                });
+            }
+
+
+            // Node Details Panel
+
+            function nodeLabelClickedHandler ( event ) {
+
+                const liElement = event.target.parentElement.parentElement;
+                const nodeData = liElement.nodeData;
+                const nodeType = nodeData.type;
+
+                updatePathPanel ( nodeData );
+                updateAttributesPanel ( nodeData, nodeType );
+                updateChildNodesPanel ( nodeData, nodeType );
+                updateTextPanel ( nodeData, nodeType );
+            }
+
+            function updatePathPanel ( nodeData ) {
+
+                document.getElementById ( "node-path-panel" ).style.display = "block";
+                document.getElementById ( "node-path-content" ).innerText = stringToSinglelineText ( nodeData.path, null );
+            }
+
+            function updateAttributesPanel ( nodeData, nodeType ) {
+
+                const nodeAttributesPanel = document.getElementById ( "node-attributes-panel" );
+                const nodeAttributesContent = document.getElementById ( "node-attributes-content" );
+                
+                if ( nodeType !== "tagged" ) {
+                    nodeAttributesPanel.style.display = "none";
+                    nodeAttributesContent.innerHTML = null;
+                    return;
+                }
+
+                nodeAttributesPanel.style.display = "block";
+
+                const attributesData = nodeData.attributes;
+                if ( ! attributesData ) {
+                    nodeAttributesContent.innerText = "No attributes";
+                    return;
+                }
+
+                const table = document.createElement ( "table" );
+
+                const headerTr = createElementFromHTML ( "table", "<tr><th></th><th>Name</th><th>Value</th></tr>" );
+                table.appendChild ( headerTr );
+
+                var index = 1
+                for ( const [name, value] of Object.entries ( attributesData ) ) {
+
+                    const rowTr = document.createElement ( "tr" );
+                    appendTdToTr ( rowTr, index );
+                    appendTdToTr ( rowTr, stringToSinglelineText ( name, 50 ) );
+                    appendTdToTr ( rowTr, stringToSinglelineText ( value, 100 ) );
+                    table.appendChild ( rowTr );
+
+                    index++;
+                }
+
+                nodeAttributesContent.replaceChildren ( table );
+            }
+
+            function updateChildNodesPanel ( nodeData, nodeType ) {
+
+                const nodeChildNodesPanel = document.getElementById ( "node-child-nodes-panel" );
+                const nodeChildNodesContent = document.getElementById ( "node-child-nodes-content" );
+                
+                if ( nodeType !== "tagged" ) {
+                    nodeChildNodesPanel.style.display = "none";
+                    nodeChildNodesContent.innerHTML = null;
+                    return;
+                }
+
+                nodeChildNodesPanel.style.display = "block";
+
+                const childNodesData = nodeData.childNodes;
+                if ( ! childNodesData ) {
+                    nodeChildNodesContent.innerText = "No child nodes";
+                    return;
+                }
+
+                const table = document.createElement ( "table" );
+                
+                const headerTr = createElementFromHTML ( "table", "<tr><th></th><th>Type</th><th>Value</th></tr>" );
+                table.appendChild ( headerTr );
+
+                // Table Rows
+
+                var index = 1;
+                for ( const childNodeData of childNodesData ) {
+
+                    var typeText;
+                    var valueText;
+                    const childNodeType = childNodeData.type;
+                    
+                    if ( childNodeType === "tagged" ) {
+                        if ( ! childNodeData.childNodes ) {
+                            typeText = "Tagged leaf node";
+                            valueText = "[" + childNodeData.tag + "]";
+                        } else {
+                            if ( childNodeData.childNodes.length === 1 &&
+                                childNodeData.childNodes[0].type === "text" ) {
+                                    typeText = "Tagged text node";
+                                    const text = childNodeData.childNodes[0].text;
+                                valueText = "[" + childNodeData.tag + " " + text + "]";
+                            } else {
+                                typeText = "Tagged branch node";
+                                valueText = "[" + childNodeData.tag + " …]";
+                            }
+                        }
+                    
+                    } else if ( childNodeType === "text") {
+                        typeText = "Text leaf";
+                        valueText = childNodeData.text;
+                    
+                    } else if ( childNodeType === "comment") {
+                        typeText = "Comment leaf";
+                        valueText = childNodeData.text;
+                    
+                    } else {
+                        error ( "Unexpected child node type " + childNodeType );
+                    }
+
+                    const rowTr = document.createElement ( "tr" );
+                    appendTdToTr ( rowTr, index );
+                    appendTdToTr ( rowTr, typeText );
+                    appendTdToTr ( rowTr, stringToSinglelineText ( valueText, 120 ) );
+                    table.appendChild ( rowTr );
+
+                    index++;
+                }
+                nodeChildNodesContent.replaceChildren ( table );
+            }
+
+            function updateTextPanel ( nodeData, nodeType ) {
+
+                const nodeTextPanel = document.getElementById ( "node-text-panel" );
+                const nodeTextContent = document.getElementById ( "node-text-content" );
+
+                if ( nodeType === "tagged" ) {
+                    nodeTextPanel.style.display = "none";
+                    nodeTextContent.innerHTML = null;
+                } else {
+                    nodeTextPanel.style.display = "block";
+                    nodeTextContent.innerText = stringToMultilineText ( nodeData.text );
+                }
+            }
+
+
+            // Whitespace
+
+            function isWhitespace ( string ) {
+
+                if ( string === null ) {
+                    return false;
+                }
+                
+                for ( const char of string ) {
+                    const isWSChar =
+                        char == " " ||
+                        char == "\n" ||
+                        char == "\r" ||
+                        char == "\t";
+                    if ( ! isWSChar ) {
+                        return false;
+                    }
+                };
+                return true;
+            }
+
+            function replaceWhitespaceChars ( string, keepLineBreaks ) {
+
+                if ( string === null ) {
+                    return string;
+                }
+                
+                var result = string
+                    .replaceAll ( " ", "␣" )
+                    .replaceAll ( "\r", "␍" )
+                    .replaceAll ( "\t", "⇥" );
+
+                if ( keepLineBreaks ) {
+                    result = result.replaceAll ( "\n", "↵\n" );
+                } else {
+                    result = result.replaceAll ( '\n', '↵' );
+                }
+
+                return result;
+            }
+
+            function replaceLinebreakChars ( string ) {
+
+                if ( string === null ) {
+                    return string;
+                }
+                
+                return string
+                    .replaceAll ( "\r", "" )
+                    .replaceAll ( "\n", "↵" );
+            }
+
+            function stringToMultilineText ( string ) {
+
+                if ( string === null ) {
+                    return string;
+                }
+                
+                if ( isWhitespace ( string ) ) {
+                    return replaceWhitespaceChars ( string, true )
+                } else {
+                    return string;
+                }
+            }
+
+            function stringToSinglelineText ( string, maxChars ) {
+
+                if ( string === null ) {
+                    return string;
+                }
+                
+                var temp;
+                if ( isWhitespace ( string ) ) {
+                    temp = replaceWhitespaceChars ( string, false )
+                } else {
+                    temp = replaceLinebreakChars ( string );
+                }
+
+                if ( maxChars === null ) {
+                    return temp;
+                } else {
+                    return truncateText ( temp, maxChars );
+                }
+            }
+
+            function truncateText ( string, maxChars ) {
+
+                if ( string === null ) {
+                    return string;
+                }
+                
+                if ( string.length <= maxChars ) {
+                    return string;
+                } else {
+                    return string.substring ( 0, maxChars - 2 ) + " …";
+                }
+            }
+
+
+            // Helper Funcions
+
+            function isTaggedLeafNode ( nodeData ) {
+                
+                if ( nodeData.type !== "tagged" ) {
+                    return false;
+                } else {
+                    return ! nodeData.childNodes && ! nodeData.attributes;
+                }
+            }
+
+            function appendTdToTr ( tr, tdText ) {
+            
+                const td = document.createElement ( "td" );
+                td.innerText = tdText;
+                tr.appendChild ( td );
+            }
+
+            // https://stackoverflow.com/questions/3103962/converting-html-string-into-dom-elements
+
+            // Note: validParentElementName must be a valid parent tag name for the element to be created
+            // (e.g. a <tr> must have a <table> as parent)
+            // Note: htmlString must have ONE root node
+            function createElementFromHTML ( validParentElementName, htmlString ) {
+
+                const dummyParent = document.createElement ( validParentElementName );
+                dummyParent.innerHTML = htmlString;
+                return dummyParent.firstElementChild;
+            }
+
+            /*
+            function createElementFromHTML ( htmlString ) {
+
+                const doc = new DOMParser().parseFromString ( htmlString, "text/html" );
+                // logNameValue ( "doc.body.innerHTML", doc.body.innerHTML );
+                return doc.body.firstChild;
+            }
+            */
+
+            function iterateOverTree ( element, consumer ) {
+                
+                consumer.call ( this, element );
+
+                // Recursively process each child element
+                for ( let i = 0; i < element.children.length; i++ ) {
+                    iterateOverTree ( element.children[i], consumer );
+                }
+            }
+
+            function logNameValue ( name, value ) {
+                console.log ( name + ": " + value );
+            }
+
+            function error ( message ) {
+                console.log ( "ERROR: " + message );
+            }
+
+            function info ( message ) {
+                console.log ( "INFO: " + message );
+            }
+
+
+            // PDML Tree Data Encoded as JSON
+            const pdmlTreeData = {{pdmlTreeData}};
+       </script>
+    </body>
+</html>

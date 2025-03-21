@@ -10,6 +10,9 @@ bin/Git/
 # Gradle build output directory
 **/build
 
+# JReleaser output directory
+**/out/jreleaser
+
 # 'temp' directories
 **/temp
 
@@ -18,6 +21,9 @@ bin/Git/
 
 # Directories and files starting with NOGIT_
 **/NOGIT_*
+
+
+**/jreleaser.yml
 
 
 ############################

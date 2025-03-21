@@ -1,4 +1,0 @@
-plugins {
-    id 'dev.pdml.java-common-conventions'
-    id 'application'
-}

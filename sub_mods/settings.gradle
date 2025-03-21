@@ -1,0 +1,12 @@
+rootProject.name = 'pdml'
+include (
+    'pdml-core',
+    'pdml-data',
+    'pdml-html',
+    'pdml-json',
+    'pdml-parser',
+    'pdml-reader',
+    'pdml-utils',
+    'pdml-writer',
+    'pdml-xml',
+    'pdml-companion' )

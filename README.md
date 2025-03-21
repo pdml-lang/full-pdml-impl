@@ -1,9 +1,7 @@
-# Full PDML Implementation Written in Java
+# Full PDML Reference Implementation Written in Java
 
-This repository contains the source code files of a full PDML implementation written in Java.
+This repository contains the source code files of the PDML reference implementation written in Java.
 
-This implementation supports PDML extensions, and is therefore much more elaborate than a simple implementation supporting only basic PDML (without extensions).
-
-The parser included in this implementation supports the standard and alternative attribute syntaxes, as well as lenient parsing.
+All PDML extensions are implemented, but they are all experimental. Therefore this implementation is much more elaborate than a simple implementation supporting only Core PDML (without extensions).
 
 For more information about PDML please visit its [website](https://pdml-lang.dev/).
