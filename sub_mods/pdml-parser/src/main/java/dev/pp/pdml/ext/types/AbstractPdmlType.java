@@ -63,11 +63,11 @@ public abstract class AbstractPdmlType<T> implements PdmlType<T> {
     protected static @NotNull TextToken readTrimmedTextToken (
         @NotNull PdmlReader pdmlReader ) throws IOException, PdmlException {
 
-        pdmlReader.skipSpacesAndTabsAndLineBreaksAndComments();
+        pdmlReader.skipWhitespaceAndComments ();
         TextLocation startLocation = pdmlReader.currentLocation();
         // TODO? use parser to read text, with support for extensions
         @Nullable String string = pdmlReader.readText();
-        pdmlReader.skipSpacesAndTabsAndLineBreaksAndComments();
+        pdmlReader.skipWhitespaceAndComments ();
         if ( string != null ) {
             string = string.trim();
         }

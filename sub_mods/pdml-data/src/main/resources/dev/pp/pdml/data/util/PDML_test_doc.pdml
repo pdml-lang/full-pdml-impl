@@ -1,5 +1,5 @@
 [PDML_test_doc
-    [PDML_core
+    [Core_PDML
         [Data
             [server_config
                 [name Office Server]
@@ -112,13 +112,18 @@ tab\ttab\ttab]
 
             [insert_code ^s[icode "\"[nl]\""]]
 
-            [script Emojis from +U1F600 to +U1F605: ^s[script """
-                StringBuilder sb = new StringBuilder();
-                for ( int u = 0x1F600; u <= 0x1F605; u++ ) {
-                    sb.appendCodePoint ( u );
-                }
-                ctx.doc().insertText ( sb.toString() );
-                """]]
+            [script
+                ^s[script
+                    """
+                    StringBuilder sb = new StringBuilder();
+                    // for ( int u = 0x0041; u <= 0x0050; u++ ) {
+                    for ( int u = 0x1F600; u <= 0x1F605; u++ ) {
+                        sb.appendCodePoint ( u );
+                    }
+                    ctx.doc().insertText ( sb.toString() );
+                    """
+                ]
+            ]
 
             ["definition (Java class)"
                 ^s[def

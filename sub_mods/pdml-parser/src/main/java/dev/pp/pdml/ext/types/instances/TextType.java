@@ -13,7 +13,7 @@ public class TextType extends AbstractPdmlType<String> {
 
         // TODO? allow embedded comments
         PdmlReader reader = pdmlParser.getPdmlReader();
-        TextToken textToken = reader.currentToken();
+        TextToken textToken = reader.currentCharToken ();
         // @Nullable String string = reader.readText();
         @Nullable String string = pdmlParser.parseTextAndIgnoreComments();
         return new ObjectTokenPair<> ( string, textToken );

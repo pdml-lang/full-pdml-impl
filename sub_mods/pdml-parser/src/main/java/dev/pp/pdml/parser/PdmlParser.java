@@ -40,15 +40,26 @@ import dev.pp.core.text.token.TextToken;
 
 import java.io.IOException;
 import java.io.Reader;
-import java.util.Collection;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 import java.util.function.BiConsumer;
 
 import static dev.pp.pdml.data.PdmlExtensionsConstants.*;
 
 public class PdmlParser extends CorePdmlParser {
+
+
+    private static final @NotNull Set<Character> TEXT_END_CHARS_WITH_CARET =
+        addCaret ( CorePdmlConstants.TEXT_END_CHARS );
+
+    private static final @NotNull Set<Character> QUOTED_STRING_LITERAL_END_CHARS_WITH_CARET =
+        addCaret ( QUOTED_STRING_LITERAL_END_CHARS );
+
+    private static @NotNull Set<Character> addCaret ( @NotNull Set<Character> charSet ) {
+
+        Set<Character> result = new HashSet<> ( charSet );
+        result.add ( EXTENSION_START_CHAR );
+        return Collections.unmodifiableSet ( result );
+    }
 
 
     private enum ExtensionInitiatorKind {
@@ -84,7 +95,6 @@ public class PdmlParser extends CorePdmlParser {
             this.startLocation = startLocation;
         }
     }
-
 
     private static final int DEFAULT_LOOKAHEAD = 500;
 
@@ -228,7 +238,7 @@ public class PdmlParser extends CorePdmlParser {
             throw new InvalidPdmlDataException (
                 "A node cannot be closed after a separator. A separator must be followed by node content (e.g. text or child nodes). Note: an empty node cannot have a separator.",
                 "NODE_CONTENT_REQUIRED",
-                reader.currentToken() );
+                reader.currentCharToken () );
         }
 
         PdmlNodeSpec nodeSpec = nodeSpecs == null ? null : nodeSpecs.getOrNull ( taggedNode.getTag () );
@@ -341,15 +351,15 @@ public class PdmlParser extends CorePdmlParser {
 
         return parseCharsAndExtensionsAndIgnoreComments (
             ExtensionInitiatorKind.TEXT,
+            TEXT_END_CHARS_WITH_CARET,
             CorePdmlConstants.INVALID_TEXT_CHARS,
-            CorePdmlConstants.INVALID_TEXT_CHARS,
-            CorePdmlConstants.TEXT_ESCAPE_CHARS );
+            CorePdmlConstants.TAG_AND_TEXT_ESCAPE_CHARS );
     }
 
     private @Nullable String parseCharsAndExtensionsAndIgnoreComments (
         @NotNull ExtensionInitiatorKind initiatorKind,
         @NotNull Set<Character> endChars,
-        @Nullable Set<Character> invalidChars,
+        @NotNull Set<Character> invalidChars,
         @NotNull Map<Character,Character> charEscapeMap ) throws IOException, PdmlException {
 
         StringBuilder result = new StringBuilder();
@@ -368,9 +378,9 @@ public class PdmlParser extends CorePdmlParser {
             textConsumer,
             commentConsumer,
             ExtensionInitiatorKind.TEXT,
+            TEXT_END_CHARS_WITH_CARET,
             CorePdmlConstants.INVALID_TEXT_CHARS,
-            CorePdmlConstants.INVALID_TEXT_CHARS,
-            CorePdmlConstants.TEXT_ESCAPE_CHARS );
+            CorePdmlConstants.TAG_AND_TEXT_ESCAPE_CHARS );
     }
 
     private void parseCharsCommentsAndExtensions (
@@ -378,7 +388,7 @@ public class PdmlParser extends CorePdmlParser {
         @NotNull BiConsumer<String, TextLocation> commentConsumer,
         @NotNull ExtensionInitiatorKind initiatorKind,
         @NotNull Set<Character> endChars,
-        @Nullable Set<Character> invalidChars,
+        @NotNull Set<Character> invalidChars,
         @NotNull Map<Character,Character> charEscapeMap ) throws IOException, PdmlException {
 
         PendingsChars pendingChars = new PendingsChars ( reader.currentLocation() );
@@ -388,9 +398,10 @@ public class PdmlParser extends CorePdmlParser {
                 handleExtension (
                     charsConsumer, commentConsumer, pendingChars, initiatorKind );
             } else {
-                boolean charsAppended = reader.appendChars (
-                    pendingChars.chars, endChars, invalidChars, charEscapeMap );
-                if ( ! charsAppended ) {
+                String chars = reader.readTagOrText ( endChars, invalidChars, charEscapeMap, true );
+                if ( chars != null) {
+                    pendingChars.chars.append ( chars );
+                } else {
                     break;
                 }
             }
@@ -534,12 +545,12 @@ public class PdmlParser extends CorePdmlParser {
         } else if ( reader.isAtChar ( RAW_STRING_LITERAL_START_CHAR ) ) {
             return reader.readRawStringLiteral();
         } else {
-            // unquoted string literal
+            // bare string literal
             return parseCharsAndExtensionsAndIgnoreComments (
                 extensionInitiatorKind,
                 CorePdmlConstants.INVALID_TAG_CHARS,
-                null,
-                CorePdmlConstants.TAG_ESCAPE_CHARS );
+                CorePdmlConstants.INVALID_TAG_CHARS,
+                CorePdmlConstants.TAG_AND_TEXT_ESCAPE_CHARS );
         }
     }
 
@@ -558,7 +569,7 @@ public class PdmlParser extends CorePdmlParser {
 
         @Nullable String result = parseCharsAndExtensionsAndIgnoreComments (
             extensionInitiatorKind,
-            QUOTED_STRING_LITERAL_END_CHARS,
+            QUOTED_STRING_LITERAL_END_CHARS_WITH_CARET,
             QUOTED_STRING_LITERAL_INVALID_CHARS,
             QUOTED_STRING_LITERAL_ESCAPE_MAP );
 
@@ -579,9 +590,9 @@ public class PdmlParser extends CorePdmlParser {
         throws IOException, PdmlException {
 
         reader.setMark ( DEFAULT_LOOKAHEAD );
-        reader.skipSpacesAndTabsAndLineBreaks();
+        reader.skipWhitespace ();
 
-        TextToken startToken = reader.currentToken();
+        TextToken startToken = reader.currentCharToken ();
         // Note: don't use reader.isAtString because setMark can't ba called twice in a row
         boolean hasNamespaces = reader.skipAllWhileCharsMatch ( NAMESPACE_DECLARATIONS_EXTENSION_START );
 
@@ -668,15 +679,15 @@ public class PdmlParser extends CorePdmlParser {
 
         if ( nodeSpec != null && nodeSpec.hasOnlyAttributes() ) {
             // reader.skipSpacesAndTabsAndNewLinesAndComments();
-            reader.skipSpacesAndTabsAndLineBreaks();
+            reader.skipWhitespace ();
             return parseAttributesWithOptionalParenthesis();
 
         } else {
 
             reader.setMark ( DEFAULT_LOOKAHEAD );
-            reader.skipSpacesAndTabsAndLineBreaks();
+            reader.skipWhitespace ();
 
-            TextToken startToken = reader.currentToken();
+            TextToken startToken = reader.currentCharToken ();
             // Note: don't use reader.isAtString because setMark can't ba called twice in a row
             boolean hasAttributes = reader.skipAllWhileCharsMatch ( ATTRIBUTES_EXTENSION_START );
             if ( ! hasAttributes && allowAttributesWithoutCaret ) {
@@ -796,7 +807,7 @@ public class PdmlParser extends CorePdmlParser {
 
     private void skipAttributesSeparator ( boolean isFirstAttribute ) throws IOException, MalformedPdmlException {
 
-        boolean skipped = reader.skipSpacesAndTabsAndLineBreaksAndComments();
+        boolean skipped = reader.skipWhitespaceAndComments ();
         if ( ! isFirstAttribute && ! skipped ) {
             throw errorAtCurrentLocation ( "Attributes separator required", "ATTRIBUTES_SEPARATOR_REQUIRED" );
         }
@@ -854,14 +865,14 @@ public class PdmlParser extends CorePdmlParser {
     private void requireAttributeAssignment ( @NotNull String attributeName )
         throws IOException, MalformedPdmlException {
 
-        skipSpacesAndTabsAndLineBreaks ();
+        skipWhitespace ();
         if ( ! reader.readAttributeAssignSymbol() ) {
             throw errorAtCurrentLocation (
                 "Expecting character '" + PdmlExtensionsConstants.ATTRIBUTE_ASSIGN_CHAR + "' to assign a value to attribute '"
                     + attributeName + "', but found '" + reader.currentChar() + "'.",
                 "ATTRIBUTE_ASSIGN_SYMBOL_REQUIRED" );
         }
-        skipSpacesAndTabsAndLineBreaks ();
+        skipWhitespace ();
     }
 
     private @NotNull String requireAttributeValue() throws IOException, PdmlException {

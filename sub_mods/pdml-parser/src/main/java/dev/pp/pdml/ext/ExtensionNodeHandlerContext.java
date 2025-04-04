@@ -64,8 +64,8 @@ public class ExtensionNodeHandlerContext {
     }
 
 
-    public void skipSpacesAndTabsAndLineBreaksAndComments () throws IOException, MalformedPdmlException {
-        pdmlReader.skipSpacesAndTabsAndLineBreaksAndComments();
+    public void skipWhitespaceAndComments() throws IOException, MalformedPdmlException {
+        pdmlReader.skipWhitespaceAndComments ();
     }
 
     public void requireExtensionNodeEnd ( @NotNull NodeTag nodeName ) throws IOException, MalformedPdmlException {
@@ -75,7 +75,7 @@ public class ExtensionNodeHandlerContext {
             throw new MalformedPdmlException (
                 "Expecting '" + CorePdmlConstants.NODE_END_CHAR + "'.",
                 "EXTENSION_NODE_END_REQUIRED",
-                pdmlReader.currentToken() );
+                pdmlReader.currentCharToken () );
         }
 /*
             String message = "Expecting '" + CorePdmlConstants.NODE_END_CHAR + "' to close node '" + taggedNode.getName() + "'";
@@ -113,6 +113,6 @@ public class ExtensionNodeHandlerContext {
     public @NotNull PdmlException errorAtCurrentLocation (
         @NotNull String message, @NotNull String id ) {
 
-        return error ( message, id, pdmlReader.currentToken() );
+        return error ( message, id, pdmlReader.currentCharToken () );
     }
 }

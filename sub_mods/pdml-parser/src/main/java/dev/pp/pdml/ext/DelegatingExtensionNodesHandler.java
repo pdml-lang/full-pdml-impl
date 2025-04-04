@@ -60,7 +60,7 @@ public class DelegatingExtensionNodesHandler implements ExtensionNodesHandler {
             throw new MalformedPdmlException (
                 "Expecting '" + CorePdmlConstants.NODE_START_CHAR + "'.",
                 "EXTENSION_NODE_START_REQUIRED",
-                pdmlReader.currentToken() );
+                pdmlReader.currentCharToken () );
         }
 
         return handleExtension ( pdmlReader, pdmlParser, extensionKind );

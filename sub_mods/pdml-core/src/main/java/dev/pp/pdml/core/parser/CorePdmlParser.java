@@ -92,12 +92,12 @@ public class CorePdmlParser {
     }
 
     public void skipWhitespaceBeforeRootNode() throws IOException {
-        skipSpacesAndTabsAndLineBreaks();
+        skipWhitespace ();
     }
 
     public void requireDocumentEnd() throws IOException, PdmlException {
 
-        skipSpacesAndTabsAndLineBreaks();
+        skipWhitespace ();
         if ( reader.isNotAtEnd() ) {
             throw errorAtCurrentLocation ( "No more text expected", "END_OF_DOCUMENT_EXPECTED" );
         }
@@ -301,7 +301,7 @@ public class CorePdmlParser {
         }
     }
 
-    public @Nullable TaggedNode parseEmptyNode() throws IOException, PdmlException {
+    public @Nullable TaggedNode parseTaggedLeafNode() throws IOException, PdmlException {
 
         @Nullable TaggedNode taggedNode = parseNodeStartAndTag ();
         if ( taggedNode == null ) {
@@ -313,9 +313,9 @@ public class CorePdmlParser {
         return taggedNode;
     }
 
-    public @NotNull TaggedNode requireEmptyNode() throws IOException, PdmlException {
+    public @NotNull TaggedNode requireTaggedLeafNode() throws IOException, PdmlException {
 
-        @Nullable TaggedNode emptyNode = parseEmptyNode();
+        @Nullable TaggedNode emptyNode = parseTaggedLeafNode ();
         if ( emptyNode != null ) {
             return emptyNode;
         } else {
@@ -323,8 +323,8 @@ public class CorePdmlParser {
         }
     }
 
-    protected boolean skipSpacesAndTabsAndLineBreaks() throws IOException {
-        return reader.skipSpacesAndTabsAndLineBreaks();
+    protected boolean skipWhitespace() throws IOException {
+        return reader.skipWhitespace();
     }
 
 
@@ -333,6 +333,6 @@ public class CorePdmlParser {
     protected MalformedPdmlException errorAtCurrentLocation (
         @NotNull String message, @NotNull String id ) {
 
-        return new MalformedPdmlException ( message, id, reader.currentToken() );
+        return new MalformedPdmlException ( message, id, reader.currentCharToken () );
     }
 }

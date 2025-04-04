@@ -58,7 +58,7 @@ public interface PdmlType<T> {
             throw new InvalidPdmlDataException (
                 "End of node (" + CorePdmlConstants.NODE_END_CHAR + ") expected.",
                 "NODE_END_REQUIRED",
-                pdmlReader.currentToken() );
+                pdmlReader.currentCharToken () );
         }
         if ( consumeNodeEnd ) {
             // assert pdmlReader.skipChar ( CorePdmlConstants.NODE_END_CHAR );

@@ -23,10 +23,15 @@ public class CorePdmlReader {
 
 
     protected final @NotNull CharReaderWithInserts charReader;
+    protected final boolean allowUnicodeEscapes;
 
 
-    protected CorePdmlReader ( @NotNull CharReaderWithInserts charReader ) {
+    protected CorePdmlReader (
+        @NotNull CharReaderWithInserts charReader,
+        boolean allowUnicodeEscapes ) {
+
         this.charReader = charReader;
+        this.allowUnicodeEscapes = allowUnicodeEscapes;
     }
 
     /*
@@ -41,7 +46,7 @@ public class CorePdmlReader {
         @Nullable Integer lineOffset,
         @Nullable Integer columnOffset ) throws IOException {
 
-        this ( CharReaderWithInsertsImpl.createAndAdvance ( reader, resource, lineOffset, columnOffset ) );
+        this ( CharReaderWithInsertsImpl.createAndAdvance ( reader, resource, lineOffset, columnOffset ), false );
     }
 
     public CorePdmlReader (
@@ -63,7 +68,7 @@ public class CorePdmlReader {
     }
 
     public @Nullable TextToken readNodeStartToken() throws IOException, PdmlException {
-        TextToken token = currentToken();
+        TextToken token = currentCharToken ();
         return readNodeStart() ? token : null;
     }
 
@@ -79,7 +84,7 @@ public class CorePdmlReader {
     }
 
     public @Nullable TextToken readNodeEndToken() throws IOException {
-        TextToken token = currentToken();
+        TextToken token = currentCharToken();
         return readNodeEnd () ? token : null;
     }
 
@@ -92,7 +97,10 @@ public class CorePdmlReader {
 
     public @Nullable String readTag() throws IOException, PdmlException {
         return readTagOrText (
-            CorePdmlConstants.INVALID_TAG_CHARS, CorePdmlConstants.TAG_ESCAPE_CHARS );
+            CorePdmlConstants.TAG_END_CHARS,
+            CorePdmlConstants.INVALID_TAG_CHARS,
+            CorePdmlConstants.TAG_AND_TEXT_ESCAPE_CHARS,
+            allowUnicodeEscapes );
     }
 
     public @Nullable TextToken readTagToken() throws IOException, PdmlException {
@@ -114,7 +122,10 @@ public class CorePdmlReader {
 
     public @Nullable String readText() throws IOException, PdmlException {
         return readTagOrText (
-            CorePdmlConstants.INVALID_TEXT_CHARS, CorePdmlConstants.TEXT_ESCAPE_CHARS );
+            CorePdmlConstants.TEXT_END_CHARS,
+            CorePdmlConstants.INVALID_TEXT_CHARS,
+            CorePdmlConstants.TAG_AND_TEXT_ESCAPE_CHARS,
+            allowUnicodeEscapes );
     }
 
     public @Nullable TextToken readTextToken() throws IOException, PdmlException {
@@ -124,30 +135,68 @@ public class CorePdmlReader {
         return text == null ? null : new TextToken ( text, location );
     }
 
-
-    private @Nullable String readTagOrText (
+    public @Nullable String readTagOrText (
+        @NotNull Set<Character> endChars,
         @NotNull Set<Character> invalidChars,
-        @NotNull Map<Character,Character> charEscapeMap ) throws IOException, PdmlException {
+        @NotNull Map<Character, Character> escapeChars,
+        boolean allowUnicodeEscapes ) throws IOException, PdmlException {
 
         final StringBuilder result = new StringBuilder();
 
         while ( true ) {
 
-            // handleExtensionNode();
-
             char currentChar = charReader.currentChar();
-            if ( invalidChars.contains ( currentChar ) || isAtEnd() ) {
-                return result.isEmpty() ? null : result.toString();
-            }
 
-            if ( currentChar == CorePdmlConstants.ESCAPE_CHAR ) {
-                appendCharacterEscapeSequence ( charEscapeMap, false, result );
+            if ( isAtEnd() ) {
+                break;
+
+            } else if ( endChars.contains ( currentChar ) ) {
+                break;
+
+            } else if ( invalidChars.contains ( currentChar ) ) {
+                errorDetectedAtCurrentPosition (
+                    "Character '" + currentChar + "' is not allowed in this context.",
+                    "INVALID_CHAR" );
+
+            } else if ( currentChar <= 0X001F &&
+                currentChar != '\n' && currentChar != '\r' && currentChar != '\t' && currentChar != '\f' ) {
+                String hexString = charToHexString ( currentChar );
+                errorDetectedAtCurrentPosition (
+                    "Unicode code point " + hexString + " is invalid. Unicode code points below U+001F (control characters) are not allowed, except U+0009 (Character Tabulation), U+000A (End of Line), U+000C (Form Feed), and U+000D (Carriage Return).",
+                    "INVALID_CHAR" );
+
+            } else if ( currentChar >= 0X0080 && currentChar <= 0X009F ) {
+                String hexString = charToHexString ( currentChar );
+                errorDetectedAtCurrentPosition (
+                    "Unicode code point " + hexString + " is invalid. Unicode code points in the range U+0080 to U+009F (control characters) are not allowed.",
+                    "INVALID_CHAR" );
+
+            /*
+                This doesn't work because Java uses UTF-16 to store strings in memory
+                Each char in Java is a 16-bit (2-byte) code unit, which follows UTF-16 encoding rules.
+                } else if ( currentChar >= 0XD800 && currentChar <= 0XDFFF ) {
+                    String hexString = charToHexString ( currentChar );
+                    errorDetectedAtCurrentPosition (
+                        "Unicode code point " + hexString + " is invalid. Unicode code points in the range U+D800 to U+DFFF are not allowed (they are surrogates reserved to encode code points beyond U+FFFF in UTF-16).",
+                        "INVALID_CHAR" );
+             */
+
+            } else if ( currentChar == CorePdmlConstants.ESCAPE_CHAR ) {
+                appendCharacterEscapeSequence ( escapeChars, allowUnicodeEscapes, result );
+
             } else {
                 result.append ( currentChar );
                 charReader.advance();
             }
         }
+
+        return result.isEmpty() ? null : result.toString();
     }
+
+    private @NotNull String charToHexString ( char c ) {
+        return Integer.toHexString ( c );
+    }
+
 
     protected void appendCharacterEscapeSequence (
         @NotNull Map<Character,Character> charEscapeMap,
@@ -159,23 +208,28 @@ public class CorePdmlReader {
             CharEscapeUtil.unescapeSequenceAndAppend ( charReader, charEscapeMap, allowUnicodeEscapes, result );
 
         } catch ( InvalidTextException e ) {
-/*
-            char currentChar = currentChar();
-            if ( currentChar == 'U' ) {
-                throw abortingErrorAtCurrentLocation (
-                    "The \\Uhhhhhhhh syntax for escaping Unicode characters is no more supported. Please use the new \\u{hhhhhh} syntax instead.",
-                    "INVALID_ESCAPED_CHARACTER" );
-            } else if ( currentChar == '(' || currentChar == ')' ) {
-                throw abortingErrorAtCurrentLocation (
-                    "The \\( and \\) syntax for escaping parenthesis is no more supported.",
-                    "INVALID_ESCAPED_CHARACTER" );
-            } else {
- */
-                String id = e.getErrorId();
-                if ( id == null ) id = "INVALID_CHARACTER_ESCAPE_SEQUENCE";
-                throw new MalformedPdmlException ( e.getMessage(), id, e.textToken() );
-//            }
+            String id = e.getErrorId();
+            if ( id == null ) id = "INVALID_CHARACTER_ESCAPE_SEQUENCE";
+            errorDetected ( e.getMessage(), id, e.textToken() );
         }
+    }
+
+
+    // Error handling
+
+    private void errorDetected (
+        @NotNull String message,
+        @NotNull String id,
+        @Nullable TextToken token ) throws MalformedPdmlException {
+
+        throw new MalformedPdmlException ( message, id, token );
+    }
+
+    private void errorDetectedAtCurrentPosition (
+        @NotNull String message,
+        @NotNull String id ) throws MalformedPdmlException {
+
+        throw new MalformedPdmlException ( message, id, currentCharToken () );
     }
 
 
@@ -201,7 +255,7 @@ public class CorePdmlReader {
         return charReader.isNextChar ( c );
     }
 
-    public @NotNull TextToken currentToken() {
+    public @NotNull TextToken currentCharToken() {
         return new TextToken ( currentChar(), currentLocation() );
     }
 
@@ -225,7 +279,7 @@ public class CorePdmlReader {
         return charReader.skipChar ( c );
     }
 
-    public boolean skipSpacesAndTabsAndLineBreaks() throws IOException {
+    public boolean skipWhitespace() throws IOException {
         return charReader.skipSpacesAndTabsAndLineBreaks();
     }
 }

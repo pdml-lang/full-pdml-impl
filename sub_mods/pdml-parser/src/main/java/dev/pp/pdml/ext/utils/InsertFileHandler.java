@@ -94,13 +94,13 @@ public class InsertFileHandler implements ExtensionNodeHandler {
 
         // now positioned right after the node tag
 
-        context.skipSpacesAndTabsAndLineBreaksAndComments ();
+        context.skipWhitespaceAndComments ();
 
         @Nullable Parameters<?> parameters = context.parseParametersWithOptionalParenthesis (
             PARAMETER_SPECS );
         assert parameters != null;
 
-        context.skipSpacesAndTabsAndLineBreaksAndComments();
+        context.skipWhitespaceAndComments ();
         context.requireExtensionNodeEnd ( nodeName );
 
         PdmlReader reader = context.getPdmlReader();

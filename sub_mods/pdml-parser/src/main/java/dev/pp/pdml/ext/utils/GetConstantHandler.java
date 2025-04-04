@@ -38,7 +38,7 @@ public class GetConstantHandler implements ExtensionNodeHandler {
 
         // now positioned right after the node tag
 
-        context.skipSpacesAndTabsAndLineBreaksAndComments ();
+        context.skipWhitespaceAndComments ();
 
         PdmlReader reader = context.getPdmlReader();
         TextToken nameToken = reader.readTagToken ();
@@ -64,7 +64,7 @@ public class GetConstantHandler implements ExtensionNodeHandler {
                 nameToken );
         }
 
-        context.skipSpacesAndTabsAndLineBreaksAndComments();
+        context.skipWhitespaceAndComments ();
         context.requireExtensionNodeEnd ( nodeName );
 
         return new InsertStringExtensionResult ( value, InsertStringFormat.AS_IS );

@@ -41,7 +41,7 @@ public class SetConstantHandler implements ExtensionNodeHandler {
 
         // now positioned right after the node tag
 
-        context.skipSpacesAndTabsAndLineBreaksAndComments();
+        context.skipWhitespaceAndComments ();
 
         PdmlParser parser = context.getPdmlParser();
         NodeAttributes attributes = parser.parseAttributesWithOptionalParenthesis ();
@@ -52,7 +52,7 @@ public class SetConstantHandler implements ExtensionNodeHandler {
                 "MISSING_CONSTANT_DECLARATION" );
         }
 
-        context.skipSpacesAndTabsAndLineBreaksAndComments();
+        context.skipWhitespaceAndComments ();
         context.requireExtensionNodeEnd ( nodeName );
 
         Map<String, String> declaredConstants = context.getDeclaredConstants();

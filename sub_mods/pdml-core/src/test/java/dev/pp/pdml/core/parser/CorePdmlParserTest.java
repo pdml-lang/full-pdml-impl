@@ -66,15 +66,15 @@ class CorePdmlParserTest {
     }
 
     @Test
-    public void testRequireEmptyNode() throws Exception {
+    public void testRequireTaggedLeafNode () throws Exception {
 
         CorePdmlParser parser = createParser ( "[name1][tag\\[2\\]]" );
 
-        TaggedNode emptyNode = parser.requireEmptyNode();
+        TaggedNode emptyNode = parser.requireTaggedLeafNode ();
         assertEquals ( "name1", emptyNode.getTag ().qualifiedTag () );
         assertTrue ( emptyNode.isEmpty() );
 
-        emptyNode = parser.requireEmptyNode();
+        emptyNode = parser.requireTaggedLeafNode ();
         assertEquals ( "tag[2]", emptyNode.getTag ().qualifiedTag () );
         assertTrue ( emptyNode.isEmpty() );
     }

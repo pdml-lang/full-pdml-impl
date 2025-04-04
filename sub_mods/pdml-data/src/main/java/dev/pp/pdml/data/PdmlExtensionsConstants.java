@@ -34,7 +34,7 @@ public class PdmlExtensionsConstants {
 
     public static final char QUOTED_STRING_LITERAL_DELIMITER_CHAR = '\"';
     public static final @NotNull Map<Character, Character> QUOTED_STRING_LITERAL_ESCAPE_MAP =
-        CorePdmlConstants.SHARED_ESCAPE_CHARS;
+        CorePdmlConstants.TAG_AND_TEXT_ESCAPE_CHARS;
     public static final @NotNull Set<Character> QUOTED_STRING_LITERAL_END_CHARS =
         Set.of ( '"' );
     public static final @NotNull Set<Character> QUOTED_STRING_LITERAL_INVALID_CHARS =

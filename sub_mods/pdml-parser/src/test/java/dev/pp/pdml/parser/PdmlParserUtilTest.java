@@ -8,6 +8,8 @@ import dev.pp.pdml.data.node.leaf.TextLeaf;
 import dev.pp.pdml.data.util.TestDoc;
 import org.junit.jupiter.api.Test;
 
+import java.nio.charset.StandardCharsets;
+
 import static org.junit.jupiter.api.Assertions.*;
 
 class PdmlParserUtilTest {

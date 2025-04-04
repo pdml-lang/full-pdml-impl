@@ -1,5 +1,6 @@
 package dev.pp.pdml.core.reader;
 
+import dev.pp.pdml.data.exception.MalformedPdmlException;
 import dev.pp.pdml.data.exception.PdmlException;
 import dev.pp.core.basics.annotations.NotNull;
 import org.junit.jupiter.api.Test;
@@ -12,7 +13,7 @@ import static org.junit.jupiter.api.Assertions.*;
 public class CorePdmlReaderTest {
 
     @Test
-    void test() throws IOException, PdmlException {
+    void generalTest() throws IOException, PdmlException {
 
         CorePdmlReader reader = createReader ( "[root [child\r\nfoo bar]]" );
         assertTrue ( reader.readNodeStart() );
@@ -28,46 +29,121 @@ public class CorePdmlReaderTest {
     }
 
     @Test
-    void readName() throws IOException, PdmlException {
+    void readTag() throws IOException, PdmlException {
 
-        CorePdmlReader reader = createReader ( "name1" );
-        assertEquals ( "name1", reader.readTag () );
+        expectTag ( "tag1 ", "tag1" );
+        expectTag ( "tag_2] ", "tag_2" );
+        expectTag ( "2025-01-07] ", "2025-01-07" );
+        expectTag ( "tag_.-] ", "tag_.-" );
+        expectTag ( "_]", "_" );
+        expectTag ( "คุณภาพ]", "คุณภาพ" );
 
-        reader = createReader ( "name_2[" );
-        assertEquals ( "name_2", reader.readTag () );
 
-        reader = createReader ( "name_2 " );
-        assertEquals ( "name_2", reader.readTag () );
+        // Escape sequences
+        expectTag ( "tag_3\\]] ", "tag_3]" );
+        expectTag ( "tag\\s4] ", "tag 4" );
+        expectTag (
+            "\\[\\]\\s\\t\\n\\r\\f\\^\\(\\)\\=\\\"\\~\\|\\:\\,\\`\\!\\$\\\\]",
+            "[] \t\n\r\f^()=\"~|:,`!$\\" );
 
-        reader = createReader ( "tag\\s3\\\\a\\[b\\]\\^]" );
-        assertEquals ( "tag 3\\a[b]^", reader.readTag () );
+        CorePdmlReader reader = createReader ( "]" );
+        assertNull ( reader.readTag() );
 
-        reader = createReader ( "[" );
-        assertNull ( reader.readTag () );
+        // Invalid
+        expectInvalidTag ( "tag|" ); // invalid char |
+        expectInvalidTag ( "tag\\m]" ); // invalid escape char \m
 
-        reader = createReader ( "" );
-        assertNull ( reader.readTag () );
+        // Invalid Unicode control code points
+        expectInvalidTag ( "tag\u0000]" );
+        expectInvalidTag ( "tag\u001F]" );
+        expectInvalidTag ( "tag\u0080]" );
+        expectInvalidTag ( "tag\u009F]" );
 
-        reader = createReader ( "tag\\4" );
-        assertThrows ( PdmlException.class, reader::readTag );
-        // assertEquals ( "tag?4", reader.readNodeName() );
+        // Invalid Unicode surrogate code points
+        // expectInvalidTag ( "tag\uD800]" );
+        // expectInvalidTag ( "tag\uDFFF]" );
+    }
+
+    @Test
+    void readSeparator() throws IOException, PdmlException {
+
+        expectSeparator ( " ", " " );
+        expectSeparator ( "\t", "\t" );
+        expectSeparator ( "\n", "\n" );
+        expectSeparator ( "\r\n", "\r\n" );
+
+        expectSeparator ( "  ", " " );
+        expectSeparator ( "\r\n\n", "\r\n" );
+
+        expectSeparator ( "a", null );
+        expectSeparator ( "\\s", null );
     }
 
     @Test
     void readText() throws IOException, PdmlException {
 
-        CorePdmlReader reader = createReader ("text 1\r\n" );
-        assertEquals ( "text 1\r\n", reader.readText() );
+        expectText ( "text1[", "text1" );
+        expectText ( "text2]", "text2" );
+        expectText ( "123 _.- คุณภาพ]", "123 _.- คุณภาพ" );
 
-        reader = createReader ("text \\\\ \\[2\\]\\t\\n\\r]" );
-        assertEquals ( "text \\ [2]\t\n\r", reader.readText() );
+        expectText (
+            "\\[\\] \t\n\r\f\\^()=\"~|:,`!$\\\\]",
+            "[] \t\n\r\f^()=\"~|:,`!$\\" );
 
-        reader = createReader ("[foo]" );
+        // Escape sequences
+        expectText ( "text_3\\]] ", "text_3]" );
+        expectText ( "text\\s4] ", "text 4" );
+        expectText (
+            "\\[\\]\\s\\t\\n\\r\\f\\^\\(\\)\\=\\\"\\~\\|\\:\\,\\`\\!\\$\\\\]",
+            "[] \t\n\r\f^()=\"~|:,`!$\\" );
+
+        CorePdmlReader reader = createReader ( "]" );
         assertNull ( reader.readText() );
 
-        reader = createReader ("text \\4" );
-        assertThrows ( PdmlException.class, reader::readText );
-        // assertEquals ( "text ?4", reader.readText() );
+        // Invalid
+        expectInvalidText ( "text\\m]" ); // invalid escape char \m
+
+        // Invalid Unicode control code points
+        expectInvalidText ( "text\u0000]" );
+        expectInvalidText ( "text\u001F]" );
+        expectInvalidText ( "text\u0080]" );
+        expectInvalidText ( "text\u009F]" );
+
+        // Invalid Unicode surrogate code points
+        // expectInvalidText ( "text\uD800]" );
+        // expectInvalidText ( "text\uDFFF]" );
+    }
+
+    // Helpers
+
+    private void expectTag ( String code, String expectedTag ) throws IOException, PdmlException {
+
+        CorePdmlReader reader = createReader ( code );
+        assertEquals ( expectedTag, reader.readTag() );
+    }
+
+    private void expectSeparator ( String code, String expectedResult ) throws IOException, PdmlException {
+
+        CorePdmlReader reader = createReader ( code );
+        assertEquals ( expectedResult, reader.readSeparator() );
+    }
+
+    private void expectText ( String code, String expectedText ) throws IOException, PdmlException {
+
+        CorePdmlReader reader = createReader ( code );
+        assertEquals ( expectedText, reader.readText() );
+    }
+
+    private void expectInvalidTag ( String code ) throws IOException {
+
+        CorePdmlReader reader = createReader ( code );
+        assertThrows ( MalformedPdmlException.class, reader::readTag );
+    }
+
+    private void expectInvalidText ( String code ) throws IOException {
+
+        CorePdmlReader reader = createReader ( code );
+        assertThrows ( MalformedPdmlException.class, reader::readText );
     }
 
     private @NotNull CorePdmlReader createReader ( @NotNull String code ) throws IOException {

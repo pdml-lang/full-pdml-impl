@@ -1,5 +1,6 @@
 package dev.pp.pdml.parser;
 
+import dev.pp.core.basics.annotations.Nullable;
 import dev.pp.pdml.data.exception.PdmlException;
 import dev.pp.pdml.data.node.NodeTag;
 import dev.pp.pdml.data.node.tagged.TaggedNode;
@@ -39,17 +40,90 @@ class PdmlParserTest {
     @Test
     void parseTag () throws IOException, PdmlException {
 
-        PdmlParser parser = createParser ( "tag" );
-        NodeTag name = parser.parseTag ();
-        assertEquals ( "tag", name.tag () );
-        assertNull ( name.namespacePrefix() );
-        assertEquals ( "tag", name.qualifiedTag () );
+        PdmlParser parser = createParser ( "tag]" );
+        NodeTag tag = parser.parseTag();
+        assertNotNull ( tag );
+        assertEquals ( "tag", tag.tag() );
+        assertNull ( tag.namespacePrefix() );
+        assertEquals ( "tag", tag.qualifiedTag () );
 
-        parser = createParser ( "ns|local" );
-        name = parser.parseTag ();
-        assertEquals ( "ns", name.namespacePrefix() );
-        assertEquals ( "local", name.tag () );
-        assertEquals ( "ns|local", name.qualifiedTag () );
+        parser = createParser ( "ns|local]" );
+        tag = parser.parseTag ();
+        assertNotNull ( tag );
+        assertEquals ( "ns", tag.namespacePrefix() );
+        assertEquals ( "local", tag.tag () );
+        assertEquals ( "ns|local", tag.qualifiedTag () );
+
+        parser = createParser ( "\"foo bar\"]" );
+        tag = parser.parseTag();
+        assertNotNull ( tag );
+        assertEquals ( "foo bar", tag.tag() );
+        assertNull ( tag.namespacePrefix() );
+        assertEquals ( "foo bar", tag.qualifiedTag () );
+    }
+
+
+    @Test
+    void parseStringLiteral() throws IOException, PdmlException {
+
+        // Simple cases
+        checkStringLiteral ( "bare_string", "bare_string" );
+        checkStringLiteral ( "\"quoted string\"", "quoted string" );
+        checkStringLiteral ( "~|raw string|~", "raw string" );
+        checkStringLiteral ( """
+            \"\"\"
+            multi
+            line
+            string
+            \"\"\"
+            """, "multi\nline\nstring" );
+
+        // Empty/null string
+        checkStringLiteral ( " ", null );
+        checkStringLiteral ( "\"\"", null );
+        checkStringLiteral ( "~||~", null );
+        checkStringLiteral ( """
+            \"\"\"
+            \"\"\"
+            """, null );
+
+        // Escape Sequences
+        String escapes = "start\\[\\]\\s\\t\\n\\r\\f\\^\\(\\)\\=\\\"\\~\\|\\:\\,\\`\\!\\$\\\\end";
+        String expected = "start[] \t\n\r\f^()=\"~|:,`!$\\end";
+        checkStringLiteral ( escapes, expected );
+        checkStringLiteral ( "\"" + escapes + "\"", expected );
+        checkStringLiteral ( "~|" + escapes + "|~", escapes );
+        checkStringLiteral ( "\"\"\"\n" + escapes + "\n\"\"\"",escapes );
+        // TODO checkStringLiteral ( "\"\"\"e\n" + escapes + "\n\"\"\"",expected );
+
+        // Unicode Escape Sequences
+        escapes = "start\\u{41}\\u{42 43}end";
+        expected = "startABCend";
+        checkStringLiteral ( escapes, expected );
+        checkStringLiteral ( "\"" + escapes + "\"", expected );
+        checkStringLiteral ( "~|" + escapes + "|~", escapes );
+        checkStringLiteral ( "\"\"\"\n" + escapes + "\n\"\"\"",escapes );
+        checkStringLiteral ( "\"\"\"e\n" + escapes + "\n\"\"\"",expected );
+
+        // Extensions
+        String getSet = "start^[set c1=CCC]^[get c1]end";
+        expected = "startCCCend";
+        checkStringLiteral ( getSet, expected );
+        checkStringLiteral ( "\"" + getSet + "\"", expected );
+        checkStringLiteral ( "~|" + getSet + "|~", getSet );
+        checkStringLiteral ( "\"\"\"\n" + getSet + "\n\"\"\"",getSet );
+        // checkStringLiteral ( "\"\"\"e\n" + getSet + "\n\"\"\"",expected );
+    }
+
+    private void checkStringLiteral ( String pdmlCode, String expected ) throws IOException, PdmlException {
+
+        PdmlParser parser = createParser ( pdmlCode );
+        @Nullable String string = parser.parseStringLiteralOrNull();
+        if ( expected != null ) {
+            assertEquals ( expected, string );
+        } else {
+            assertNull ( string );
+        }
     }
 
     private @NotNull PdmlParser createParser ( @NotNull String code ) throws IOException {

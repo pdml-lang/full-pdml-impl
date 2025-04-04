@@ -54,72 +54,7 @@ class PdmlReaderTest {
         assertThrows ( PdmlException.class, reader::readMultilineComment );
     }
 
-/* TODO? move tests to parser
-
-    @Test
-    void readStringLiteral() throws IOException, PdmlException {
-
-        readStringLiteral ( "unquoted", "unquoted" );
-        readStringLiteral ( "unquoted ", "unquoted" );
-        readStringLiteral ( "\"quoted\"", "quoted" );
-        readStringLiteral ( "\"quoted\" ", "quoted" );
-        readStringLiteral ( "~|raw|~", "raw" );
-        readStringLiteral ( "~|raw~|~", "raw~" );
-        readStringLiteral ( "~|raw||~", "raw|" );
-        readStringLiteral ( "~~|raw|~|~~", "raw|~" );
-        readStringLiteral ( """
-            \"\"\"
-            multi
-            line
-            \"\"\"
-            """, "multi\nline" );
-
-        // Empty Value
-        readStringLiteral ( " ", null );
-        readStringLiteral ( "\"\"", "" );
-        readStringLiteral ( "~||~", "" );
-        readStringLiteral ( """
-            \"\"\"
-            \"\"\"
-            """, "" );
-
-        // Escape Sequences
-        readStringLiteral ( "unquoted\\\\\\[\\]\\s\\n\\^", "unquoted\\[] \n^" );
-        readStringLiteral ( "\"quoted\\\\[] \\n*\"", "quoted\\[] \n*" );
-        readStringLiteral ( "~|raw\\[] \n*|~", "raw\\[] \n*" );
-        readStringLiteral ( """
-            \"\"\"
-            multi
-            line\\[] *
-            \"\"\"
-            """, "multi\nline\\[] *" );
-
-        // Unicode Escape Sequences
-        readStringLiteral ( "unquoted\\u0041\\u{42}\\u{43 44}", "unquotedABCD" );
-        readStringLiteral ( "\"quoted\\u0041\\u{42}\\u{43 44}\"", "quotedABCD" );
-        readStringLiteral ( "~|raw\\u0041\\u{42}\\u{43 44}|~", "raw\\u0041\\u{42}\\u{43 44}" );
-        readStringLiteral ( """
-            \"\"\"
-            multi
-            line\\u0041\\u{42}\\u{43 44}
-            \"\"\"
-            """, "multi\nline\\u0041\\u{42}\\u{43 44}" );
-
-        // Utility Nodes
-        // cannot be tested here, because reader has no extension handler
-        // readStringLiteral ( "unquoted[u:exp 1 + 1]3", "unquoted23" );
-    }
-
-    private void readStringLiteral ( String pdmlCode, String expected ) throws IOException, PdmlException {
-
-        PdmlReader reader = createReader ( pdmlCode );
-        if ( expected != null ) {
-            assertEquals ( expected, reader.readEmptyableStringLiteral ( PdmlReader.ExtensionInitiatorKind.STRING_LITERAL ) );
-        } else {
-            assertNull ( reader.readEmptyableStringLiteral ( PdmlReader.ExtensionInitiatorKind.STRING_LITERAL ) );
-        }
-    }
-
+/*
     @Test
     public void readAttributeValue() throws Exception {
 

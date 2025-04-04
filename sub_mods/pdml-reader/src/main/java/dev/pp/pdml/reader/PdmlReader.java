@@ -29,7 +29,7 @@ import static dev.pp.pdml.data.PdmlExtensionsConstants.*;
 public class PdmlReader extends CorePdmlReader {
 
     private PdmlReader ( @NotNull CharReaderWithInserts charReader ) {
-        super ( charReader );
+        super ( charReader, true );
     }
 
     public PdmlReader ( @NotNull CharReader charReader ) throws IOException {
@@ -129,7 +129,7 @@ public class PdmlReader extends CorePdmlReader {
     private void readMultilineCommentSnippet ( @NotNull StringBuilder result ) throws IOException, MalformedPdmlException {
 
         TextLocation location = currentLocation();
-        TextToken token = currentToken();
+        TextToken token = currentCharToken ();
 
         // we are at the start of a multiline comment, i.e. ^/*
         String caretAndSlash = String.valueOf ( EXTENSION_START_CHAR ) + SINGLE_OR_MULTI_LINE_COMMENT_START_CHAR;
@@ -188,13 +188,13 @@ public class PdmlReader extends CorePdmlReader {
         return charReader.readUntilEndOfLine ( includeLineBreak );
     }
 
-    public boolean skipSpacesAndTabsAndLineBreaksAndComments() throws IOException, MalformedPdmlException {
+    public boolean skipWhitespaceAndComments() throws IOException, MalformedPdmlException {
 
         if ( isAtEnd() ) return false;
 
         boolean skipped = false;
         while ( true ) {
-            if ( skipSpacesAndTabsAndLineBreaks() ||
+            if ( skipWhitespace () ||
                 skipSingleOrMultilineComment() ) {
                 skipped = true;
             } else {
@@ -271,53 +271,6 @@ public class PdmlReader extends CorePdmlReader {
 
     public @Nullable String readExtensionKindLetters() throws IOException {
         return charReader.readWhile ( Character::isLetter );
-    }
-
-
-    /*
-    public @Nullable String readChars (
-        @NotNull Set<Character> endChars,
-        @Nullable Set<Character> invalidChars,
-        @NotNull Map<Character,Character> charEscapeMap ) throws IOException, PdmlException {
-
-        final StringBuilder result = new StringBuilder();
-        appendChars ( result, endChars, invalidChars, charEscapeMap )
-        return result.isEmpty() ? null : result.toString();
-    }
-     */
-
-    public boolean appendChars (
-        @NotNull StringBuilder sb,
-        @NotNull Set<Character> endChars,
-        @Nullable Set<Character> invalidChars,
-        @NotNull Map<Character,Character> charEscapeMap ) throws IOException, PdmlException {
-
-        boolean charsAppended = false;
-        while ( true ) {
-
-            char currentChar = charReader.currentChar();
-
-            if ( endChars.contains ( currentChar ) || isAtEnd() ) {
-                // return result.isEmpty() ? null : result.toString();
-                return charsAppended;
-            }
-
-            if ( invalidChars != null && invalidChars.contains ( currentChar ) ) {
-                throw new MalformedPdmlException (
-                    "Invalid character '" + currentChar + "'.",
-                    "INVALID_CHARACTER",
-                    currentToken() );
-            }
-
-            if ( currentChar == CorePdmlConstants.ESCAPE_CHAR ) {
-                appendCharacterEscapeSequence ( charEscapeMap, true, sb );
-            } else {
-                sb.append ( currentChar );
-                charReader.advance();
-            }
-
-            charsAppended = true;
-        }
     }
 
     public @NotNull String readRawStringLiteral() throws IOException, MalformedPdmlException {
@@ -407,7 +360,7 @@ public class PdmlReader extends CorePdmlReader {
     public MalformedPdmlException errorAtCurrentLocation (
         @NotNull String message, @NotNull String id ) {
 
-        return new MalformedPdmlException ( message, id, currentToken() );
+        return new MalformedPdmlException ( message, id, currentCharToken () );
     }
 
 

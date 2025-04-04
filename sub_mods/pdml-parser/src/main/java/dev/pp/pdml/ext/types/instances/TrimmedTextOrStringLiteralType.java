@@ -14,9 +14,9 @@ public class TrimmedTextOrStringLiteralType extends AbstractPdmlType<String> {
         OBJECT_PARSER = pdmlParser -> {
 
         PdmlReader reader = pdmlParser.getPdmlReader();
-        reader.skipSpacesAndTabsAndLineBreaksAndComments();
+        reader.skipWhitespaceAndComments ();
         @Nullable String string;
-        TextToken textToken = reader.currentToken();
+        TextToken textToken = reader.currentCharToken ();
         if ( reader.isAtChar ( '"' ) ||
             reader.isAtChar ( '~' ) ) {
             /*
@@ -28,12 +28,12 @@ public class TrimmedTextOrStringLiteralType extends AbstractPdmlType<String> {
              */
             // string = reader.readStringLiteralOrNull ( PdmlReader.ExtensionInitiatorKind.STRING_LITERAL );
             string = pdmlParser.parseStringLiteralOrNull();
-            reader.skipSpacesAndTabsAndLineBreaksAndComments();
+            reader.skipWhitespaceAndComments ();
         } else {
             // [code i = 1]
             // string = reader.readText();
             string = pdmlParser.parseTextAndIgnoreComments();
-            reader.skipSpacesAndTabsAndLineBreaksAndComments();
+            reader.skipWhitespaceAndComments ();
             if ( string != null ) {
                 string = string.trim();
             }

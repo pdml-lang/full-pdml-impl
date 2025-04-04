@@ -13,10 +13,10 @@ public class StringLiteralType extends AbstractPdmlType<String> {
         OBJECT_PARSER = pdmlParser -> {
 
         PdmlReader pdmlReader = pdmlParser.getPdmlReader();
-        pdmlReader.skipSpacesAndTabsAndLineBreaksAndComments();
+        pdmlReader.skipWhitespaceAndComments ();
         TextLocation startLocation = pdmlReader.currentLocation();
         @Nullable String string = pdmlParser.parseStringLiteralOrNull();
-        pdmlReader.skipSpacesAndTabsAndLineBreaksAndComments();
+        pdmlReader.skipWhitespaceAndComments ();
         return new ObjectTokenPair<> (
             string, TextToken.createForNullable ( string, startLocation ) );
     };
